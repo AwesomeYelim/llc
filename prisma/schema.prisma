@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────
+
+enum ServiceType {
+  SUNDAY_MAIN
+  SUNDAY_SCHOOL
+  WEDNESDAY
+  FRIDAY
+  SPECIAL
+}
+
+enum BulletinType {
+  BULLETIN
+  PPT
+}
+
+// ──────────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────────
+
+model Admin {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  hashedPassword String
+  name           String
+  role           String   @default("ADMIN")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Sermon {
+  id          Int         @id @default(autoincrement())
+  title       String
+  scripture   String
+  sermonDate  DateTime
+  serviceType ServiceType
+  youtubeUrl  String?
+  youtubeId   String?
+  blogUrl     String?
+  summary     String?     @db.Text
+  series      String?
+  tags        String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  columns     Column[]
+
+  @@map("sermons")
+}
+
+model Column {
+  id            Int      @id @default(autoincrement())
+  title         String
+  content       String   @db.Text
+  scripture     String?
+  sermonId      Int?
+  sermon        Sermon?  @relation(fields: [sermonId], references: [id])
+  coverImageUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("columns")
+}
+
+model PraiseConti {
+  id            Int      @id @default(autoincrement())
+  title         String
+  serviceDate   DateTime
+  fileName      String
+  fileUrl       String
+  fileSize      Int
+  downloadCount Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@map("praise_contis")
+}
+
+model Bulletin {
+  id           Int          @id @default(autoincrement())
+  title        String
+  serviceDate  DateTime
+  bulletinType BulletinType
+  createdAt    DateTime     @default(now())
+
+  files        BulletinFile[]
+
+  @@map("bulletins")
+}
+
+model BulletinFile {
+  id            Int      @id @default(autoincrement())
+  fileName      String
+  fileUrl       String
+  fileSize      Int
+  downloadCount Int      @default(0)
+  bulletinId    Int
+  bulletin      Bulletin @relation(fields: [bulletinId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  @@map("bulletin_files")
+}
+
+model GalleryImage {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  title     String?
+  category  String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("gallery_images")
+}
+
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model PageView {
+  id        Int      @id @default(autoincrement())
+  path      String
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@map("page_views")
+}

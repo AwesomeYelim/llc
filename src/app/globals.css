@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #1e3a5f;
+  --color-primary-light: #3b82f6;
+  --color-accent: #d4a017;
+  --color-bg: #faf8f5;
+  --color-text: #1a1a1a;
+  --font-serif: "Noto Serif KR", serif;
+}
+
+@theme inline {
+  --font-pretendard: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-serif: "Noto Serif KR", serif;
+  --color-primary: #1e3a5f;
+  --color-primary-light: #3b82f6;
+  --color-accent: #d4a017;
+  --color-bg: #faf8f5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: rgba(30, 58, 95, 0.15);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.column-content {
+  font-family: var(--font-serif);
+  line-height: 1.9;
+  color: #2a2a2a;
+}
+
+.column-content p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  padding-top: 0.05em;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.column-content blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background: rgba(212, 160, 23, 0.05);
+  font-style: italic;
+}
+
+.tiptap {
+  outline: none;
+  min-height: 300px;
+  padding: 1rem;
+}
+
+.tiptap p {
+  margin-bottom: 0.75rem;
+}
+
+.tiptap h1, .tiptap h2, .tiptap h3 {
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap h1 { font-size: 1.5rem; }
+.tiptap h2 { font-size: 1.25rem; }
+.tiptap h3 { font-size: 1.1rem; }
+
+.tiptap blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #555;
+}
+
+.tiptap ul, .tiptap ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap li {
+  margin-bottom: 0.25rem;
+}
