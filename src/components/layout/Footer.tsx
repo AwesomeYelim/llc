@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 const navLinks = [
   { href: "/about", label: "교회소개" },
@@ -17,8 +18,17 @@ export function Footer() {
     <footer className="bg-[#f5f3f0] w-full py-16 px-6 lg:px-12 border-t border-[#e4e2df]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-screen-2xl mx-auto">
         <div>
-          <div className="font-serif text-xl font-semibold text-[#022448] mb-6">
-            동남생명의빛교회
+          <div className="flex items-center gap-3 mb-6">
+            <Image
+              src="/images/logo_dark.png"
+              alt="동남생명의빛교회"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain"
+            />
+            <span className="font-serif text-xl font-semibold text-[#022448]">
+              동남생명의빛교회
+            </span>
           </div>
           <p className="text-[#1e3a5f]/70 text-sm leading-relaxed max-w-xs mb-8">
             이름을 불러주는 따뜻한 교회.

@@ -1,5 +1,9 @@
 # 동남생명의빛교회 홈페이지
 
+> **배포 URL**: [https://llc-beta.vercel.app](https://llc-beta.vercel.app)
+>
+> **GitHub**: [https://github.com/AwesomeYelim/llc](https://github.com/AwesomeYelim/llc)
+
 **동남생명의빛교회**(충북 청주시 상당구)의 공식 홈페이지입니다.
 설교 영상, 찬양 콘티, 주보/PPT, 설교 원고(칼럼), 갤러리 등 교회 콘텐츠를 관리하고 성도들에게 제공하기 위한 풀스택 웹 애플리케이션입니다.
 

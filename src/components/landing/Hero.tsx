@@ -2,48 +2,62 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Hero() {
   return (
     <section className="relative h-[90vh] min-h-[600px] flex items-center overflow-hidden">
-      {/* Background with editorial gradient */}
-      <div className="absolute inset-0 editorial-gradient" />
-      <div
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      {/* Background photo */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/main_worship.png"
+          alt="동남생명의빛교회 예배당"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 editorial-gradient opacity-60" />
+      </div>
 
       <div className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
         <div className="max-w-2xl">
-          <motion.span
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-block text-[#f6be39] font-semibold tracking-widest uppercase text-sm mb-4"
           >
-            믿음 위에 세워진 공동체
-          </motion.span>
+            <Image
+              src="/images/logo_w.png"
+              alt="동남생명의빛교회 로고"
+              width={120}
+              height={120}
+              className="w-24 h-24 lg:w-32 lg:h-32 object-contain mb-6"
+            />
+          </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-8"
+            className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4"
           >
-            동남생명의
-            <br />
-            빛교회
+            동남생명의빛교회
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-white/80 text-lg md:text-2xl font-light mb-10 max-w-lg leading-relaxed"
+            className="text-[#f6be39] text-lg md:text-2xl font-semibold mb-6"
+          >
+            &ldquo;하나님의 일을 성공시켜라&rdquo;
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="text-white/70 text-base md:text-lg mb-10 max-w-lg leading-relaxed"
           >
             이름을 불러주는 따뜻한 교회.
             <br />
@@ -53,7 +67,7 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 1.0 }}
             className="flex flex-wrap gap-4"
           >
             <Link

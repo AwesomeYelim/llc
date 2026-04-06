@@ -29,7 +29,13 @@ export default async function AboutPage() {
       <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-[#022448]/80 to-[#1e3a5f]/90 z-10" />
-          <div className="w-full h-full bg-[#1e3a5f]" />
+          <Image
+            src="/images/after_worship.png"
+            alt="동남생명의빛교회"
+            fill
+            className="object-cover"
+            priority
+          />
         </div>
         <div className="relative z-20 text-center px-6 max-w-4xl">
           <p className="text-[#ffdfa0] text-sm tracking-widest uppercase mb-4">

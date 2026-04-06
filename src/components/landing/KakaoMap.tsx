@@ -3,7 +3,9 @@
 import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
-  const mapQuery = encodeURIComponent(address || "충북 청주시 상당구 동남생명의빛교회")
+  const naverQuery = encodeURIComponent(address || "충북 청주시 상당구 동남생명의빛교회")
+  // Naver map embed - map only (no sidebar)
+  const naverMapUrl = `https://map.naver.com/p/search/${naverQuery}?c=15.00,0,0,0,dh`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
@@ -55,12 +57,12 @@ export function KakaoMap({ address }: { address: string }) {
             </div>
           </div>
           <a
-            href={`https://map.kakao.com/?q=${mapQuery}`}
+            href={`https://map.naver.com/p/search/${naverQuery}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-[#022448] font-bold hover:text-[#795900] transition-colors"
           >
-            카카오맵에서 보기
+            네이버 지도에서 보기
             <span className="material-symbols-outlined">arrow_forward</span>
           </a>
         </motion.div>
@@ -73,13 +75,13 @@ export function KakaoMap({ address }: { address: string }) {
           className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl"
         >
           <iframe
-            src={`https://map.kakao.com/?q=${mapQuery}`}
+            src={naverMapUrl}
             width="100%"
             height="100%"
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
-            title="교회 위치"
+            title="교회 위치 - 네이버 지도"
           />
         </motion.div>
       </div>

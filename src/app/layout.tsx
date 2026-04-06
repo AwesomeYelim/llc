@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
@@ -41,6 +48,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-pretendard antialiased text-[#1b1c1a] bg-[#fbf9f6]">
         {children}
