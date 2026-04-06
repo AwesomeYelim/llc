@@ -2,7 +2,6 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { formatDate, formatFileSize } from "@/lib/utils"
-import { Badge } from "@/components/ui/Badge"
 
 export const metadata: Metadata = generatePageMetadata(
   "주보 & 예배 PPT",
@@ -17,49 +16,87 @@ export default async function BulletinPage() {
   })
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-[#1e3a5f] mb-2">주보 & 예배 PPT</h1>
-      <p className="text-gray-500 mb-8">주보와 예배 PPT를 다운로드하세요.</p>
-
-      <div className="space-y-4">
-        {bulletins.map((bulletin) => (
-          <div
-            key={bulletin.id}
-            className="bg-white rounded-xl border border-gray-100 p-5"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <h3 className="font-semibold text-gray-900">{bulletin.title}</h3>
-              <Badge variant={bulletin.bulletinType === "PPT" ? "warning" : "primary"}>
-                {bulletin.bulletinType === "PPT" ? "PPT" : "주보"}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-500 mb-3">{formatDate(bulletin.serviceDate)}</p>
-            <div className="space-y-2">
-              {bulletin.files.map((file) => (
-                <a
-                  key={file.id}
-                  href={file.fileUrl}
-                  download={file.fileName}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">📄</span>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">{file.fileName}</p>
-                      <p className="text-xs text-gray-400">{formatFileSize(file.fileSize)}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-[#1e3a5f] font-medium">다운로드</span>
-                </a>
-              ))}
-            </div>
+    <div>
+      {/* Hero Header */}
+      <header className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-16">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-12 h-[1px] bg-[#795900]" />
+            <span className="text-sm uppercase tracking-[0.2em] text-[#795900] font-semibold">
+              예배 자료
+            </span>
           </div>
-        ))}
-      </div>
+          <h1 className="font-serif text-4xl md:text-6xl font-bold text-[#022448] mb-6 leading-tight">
+            주보 & 예배 PPT
+          </h1>
+          <p className="text-lg text-[#43474e] leading-relaxed">
+            주보와 예배 PPT를 다운로드하세요.
+          </p>
+        </div>
+      </header>
 
-      {bulletins.length === 0 && (
-        <p className="text-center text-gray-400 py-20">등록된 주보/PPT가 없습니다.</p>
-      )}
+      <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
+        <div className="bg-[#f5f3f0] rounded-xl p-2">
+          {bulletins.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full border-separate border-spacing-y-3">
+                <thead>
+                  <tr className="text-left">
+                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">날짜</th>
+                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">제목</th>
+                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold hidden md:table-cell">유형</th>
+                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold text-right">파일</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bulletins.map((bulletin) => (
+                    <tr key={bulletin.id} className="group hover:bg-white/50 transition-all">
+                      <td className="px-6 lg:px-8 py-8 bg-white first:rounded-l-xl">
+                        <div className="font-serif text-xl font-bold text-[#022448]">
+                          {formatDate(bulletin.serviceDate).replace(/\d{4}년\s*/, "")}
+                        </div>
+                      </td>
+                      <td className="px-6 lg:px-8 py-8 bg-white">
+                        <h3 className="font-serif text-lg font-semibold text-[#022448]">{bulletin.title}</h3>
+                      </td>
+                      <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          bulletin.bulletinType === "PPT"
+                            ? "bg-[#ffdfa0] text-[#795900]"
+                            : "bg-[#d5e3ff] text-[#022448]"
+                        }`}>
+                          {bulletin.bulletinType === "PPT" ? "PPT" : "주보"}
+                        </span>
+                      </td>
+                      <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl">
+                        <div className="flex justify-end gap-2 flex-wrap">
+                          {bulletin.files.map((file) => (
+                            <a
+                              key={file.id}
+                              href={file.fileUrl}
+                              download={file.fileName}
+                              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-sm">download</span>
+                              {file.fileName.split(".").pop()?.toUpperCase()}
+                              <span className="text-white/60 text-xs">({formatFileSize(file.fileSize)})</span>
+                            </a>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-24">
+              <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4">description</span>
+              <p className="text-[#43474e]">등록된 주보/PPT가 없습니다.</p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   )
 }

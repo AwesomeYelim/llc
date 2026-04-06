@@ -1,21 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #1e3a5f;
-  --color-primary-light: #3b82f6;
-  --color-accent: #d4a017;
-  --color-bg: #faf8f5;
-  --color-text: #1a1a1a;
+  /* Material Design 3 Color Tokens */
+  --color-primary: #022448;
+  --color-primary-container: #1e3a5f;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #8aa4cf;
+  --color-secondary: #795900;
+  --color-secondary-container: #ffc641;
+  --color-secondary-fixed: #ffdfa0;
+  --color-secondary-fixed-dim: #f6be39;
+  --color-on-secondary: #ffffff;
+  --color-surface: #fbf9f6;
+  --color-surface-container-low: #f5f3f0;
+  --color-surface-container: #efeeeb;
+  --color-surface-container-high: #eae8e5;
+  --color-surface-container-highest: #e4e2df;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #1b1c1a;
+  --color-on-surface-variant: #43474e;
+  --color-outline: #74777f;
+  --color-outline-variant: #c4c6cf;
   --font-serif: "Noto Serif KR", serif;
 }
 
 @theme inline {
   --font-pretendard: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   --font-serif: "Noto Serif KR", serif;
-  --color-primary: #1e3a5f;
-  --color-primary-light: #3b82f6;
-  --color-accent: #d4a017;
-  --color-bg: #faf8f5;
+  --color-primary: #022448;
+  --color-primary-container: #1e3a5f;
+  --color-secondary: #795900;
+  --color-secondary-container: #ffc641;
+  --color-secondary-fixed: #ffdfa0;
+  --color-accent: #795900;
+  --color-surface: #fbf9f6;
+  --color-surface-low: #f5f3f0;
+  --color-surface-high: #eae8e5;
+  --color-on-surface: #1b1c1a;
+  --color-on-surface-variant: #43474e;
+  --color-outline: #74777f;
+  --color-outline-variant: #c4c6cf;
+  --color-bg: #fbf9f6;
 }
 
 html {
@@ -23,50 +48,91 @@ html {
 }
 
 ::selection {
-  background-color: rgba(30, 58, 95, 0.15);
+  background-color: rgba(2, 36, 72, 0.15);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f5f3f0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: #c4c6cf;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #74777f;
 }
 
+/* Glass Nav */
+.glass-nav {
+  background-color: rgba(251, 249, 246, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+/* Editorial gradient */
+.editorial-gradient {
+  background: linear-gradient(135deg, #022448 0%, #1e3a5f 100%);
+}
+
+/* Drop cap for columns */
+.drop-cap::first-letter {
+  float: left;
+  font-size: 4.5rem;
+  line-height: 1;
+  padding-top: 0.5rem;
+  padding-right: 0.75rem;
+  font-family: "Noto Serif KR", serif;
+  font-weight: 700;
+  color: #022448;
+}
+
+/* Column content styles */
 .column-content {
   font-family: var(--font-serif);
   line-height: 1.9;
-  color: #2a2a2a;
+  color: #1b1c1a;
 }
 
 .column-content p:first-of-type::first-letter {
   float: left;
-  font-size: 3.5em;
-  line-height: 0.8;
-  padding-right: 0.1em;
-  padding-top: 0.05em;
+  font-size: 4.5rem;
+  line-height: 1;
+  padding-top: 0.5rem;
+  padding-right: 0.75rem;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #022448;
 }
 
 .column-content blockquote {
-  border-left: 3px solid var(--color-accent);
+  border-left: 3px solid #795900;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
-  background: rgba(212, 160, 23, 0.05);
+  background: rgba(121, 89, 0, 0.05);
   font-style: italic;
 }
 
+.column-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #022448;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.column-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #022448;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Tiptap Editor */
 .tiptap {
   outline: none;
   min-height: 300px;
@@ -88,7 +154,7 @@ html {
 .tiptap h3 { font-size: 1.1rem; }
 
 .tiptap blockquote {
-  border-left: 3px solid var(--color-accent);
+  border-left: 3px solid #795900;
   padding-left: 1rem;
   margin: 1rem 0;
   color: #555;

@@ -34,82 +34,80 @@ export function Navbar() {
 
   return (
     <>
-      <header
+      <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "fixed top-0 w-full z-50 transition-all duration-300",
           scrolled || !isHome
-            ? "bg-white/95 backdrop-blur-md shadow-sm"
+            ? "bg-[#fbf9f6]/80 backdrop-blur-md shadow-sm"
             : "bg-transparent"
         )}
       >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            <Link href="/" className="flex items-center gap-2">
-              <span
+        <div className="flex justify-between items-center px-6 lg:px-12 py-4 lg:py-6 max-w-screen-2xl mx-auto">
+          <Link href="/" className="flex items-center gap-2">
+            <span
+              className={cn(
+                "font-serif text-xl lg:text-2xl font-bold transition-colors duration-300",
+                scrolled || !isHome ? "text-[#022448]" : "text-white"
+              )}
+            >
+              동남생명의빛교회
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
                 className={cn(
-                  "text-lg lg:text-xl font-bold transition-colors",
-                  scrolled || !isHome ? "text-[#1e3a5f]" : "text-white"
+                  "font-serif text-base tracking-tight transition-colors duration-300",
+                  scrolled || !isHome
+                    ? "text-[#1e3a5f] hover:text-[#795900]"
+                    : "text-white/90 hover:text-white",
+                  pathname === link.href &&
+                    (scrolled || !isHome
+                      ? "text-[#795900] border-b-2 border-[#795900] pb-1"
+                      : "text-white border-b-2 border-white pb-1")
                 )}
               >
-                동남생명의빛교회
-              </span>
-            </Link>
-
-            {/* Desktop nav */}
-            <div className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "text-sm font-medium transition-colors relative",
-                    scrolled || !isHome
-                      ? "text-gray-700 hover:text-[#1e3a5f]"
-                      : "text-white/90 hover:text-white",
-                    pathname === link.href && "font-bold"
-                  )}
-                >
-                  {link.label}
-                  {pathname === link.href && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#d4a017]" />
-                  )}
-                </Link>
-              ))}
-            </div>
-
-            {/* Mobile hamburger */}
-            <button
-              className="lg:hidden p-2"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="메뉴"
-            >
-              <div className="w-6 h-5 relative flex flex-col justify-between">
-                <span
-                  className={cn(
-                    "w-full h-0.5 transition-all origin-left",
-                    scrolled || !isHome ? "bg-gray-800" : "bg-white",
-                    mobileOpen && "rotate-45"
-                  )}
-                />
-                <span
-                  className={cn(
-                    "w-full h-0.5 transition-all",
-                    scrolled || !isHome ? "bg-gray-800" : "bg-white",
-                    mobileOpen && "opacity-0"
-                  )}
-                />
-                <span
-                  className={cn(
-                    "w-full h-0.5 transition-all origin-left",
-                    scrolled || !isHome ? "bg-gray-800" : "bg-white",
-                    mobileOpen && "-rotate-45"
-                  )}
-                />
-              </div>
-            </button>
+                {link.label}
+              </Link>
+            ))}
           </div>
-        </nav>
-      </header>
+
+          {/* Mobile hamburger */}
+          <button
+            className="lg:hidden p-2"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="메뉴"
+          >
+            <div className="w-6 h-5 relative flex flex-col justify-between">
+              <span
+                className={cn(
+                  "w-full h-0.5 transition-all origin-left",
+                  scrolled || !isHome ? "bg-[#022448]" : "bg-white",
+                  mobileOpen && "rotate-45"
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-0.5 transition-all",
+                  scrolled || !isHome ? "bg-[#022448]" : "bg-white",
+                  mobileOpen && "opacity-0"
+                )}
+              />
+              <span
+                className={cn(
+                  "w-full h-0.5 transition-all origin-left",
+                  scrolled || !isHome ? "bg-[#022448]" : "bg-white",
+                  mobileOpen && "-rotate-45"
+                )}
+              />
+            </div>
+          </button>
+        </div>
+      </nav>
 
       {/* Mobile menu */}
       <AnimatePresence>
@@ -127,18 +125,21 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-white z-50 shadow-xl lg:hidden"
+              className="fixed top-0 right-0 bottom-0 w-72 bg-[#fbf9f6] z-50 shadow-xl lg:hidden"
             >
               <div className="p-6 pt-20">
+                <div className="font-serif text-xl font-bold text-[#022448] mb-8">
+                  동남생명의빛교회
+                </div>
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "block py-3 text-lg font-medium border-b border-gray-100",
+                      "block py-3 font-serif text-lg border-b border-[#e4e2df]",
                       pathname === link.href
-                        ? "text-[#1e3a5f] font-bold"
-                        : "text-gray-700"
+                        ? "text-[#795900] font-bold"
+                        : "text-[#1e3a5f] hover:text-[#795900]"
                     )}
                   >
                     {link.label}
