@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -45,17 +44,10 @@ export function Navbar() {
         )}
       >
         <div className="flex justify-between items-center px-6 lg:px-12 py-3 lg:py-4 max-w-screen-2xl mx-auto">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src={showDark ? "/images/logo_dark.png" : "/images/logo_w.png"}
-              alt="동남생명의빛교회"
-              width={44}
-              height={44}
-              className="w-10 h-10 lg:w-11 lg:h-11 object-contain transition-all"
-            />
+          <Link href="/" className="flex items-center">
             <span
               className={cn(
-                "font-serif text-lg lg:text-xl font-bold transition-colors duration-300 hidden sm:block",
+                "font-serif text-lg lg:text-xl font-bold transition-colors duration-300",
                 showDark ? "text-[#022448]" : "text-white"
               )}
             >
@@ -137,16 +129,9 @@ export function Navbar() {
               className="fixed top-0 right-0 bottom-0 w-72 bg-[#fbf9f6] z-50 shadow-xl lg:hidden"
             >
               <div className="p-6 pt-8">
-                <div className="flex items-center gap-3 mb-8">
-                  <Image
-                    src="/images/logo_dark.png"
-                    alt="동남생명의빛교회"
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 object-contain"
-                  />
+                <div className="mb-8">
                   <span className="font-serif text-lg font-bold text-[#022448]">
-                    동남생명의빛교회
+                    Light of Life Church
                   </span>
                 </div>
                 {navLinks.map((link) => (

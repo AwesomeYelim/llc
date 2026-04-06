@@ -21,20 +21,6 @@ export function Hero() {
 
       <div className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
         <div className="max-w-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <Image
-              src="/images/logo_w.png"
-              alt="동남생명의빛교회 로고"
-              width={120}
-              height={120}
-              className="w-24 h-24 lg:w-32 lg:h-32 object-contain mb-6"
-            />
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
