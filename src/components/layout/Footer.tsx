@@ -27,19 +27,19 @@ export function Footer() {
               className="w-10 h-10 object-contain"
             />
             <span className="font-serif text-xl font-semibold text-[#022448]">
-              동남생명의빛교회
+              Light of Life Church
             </span>
           </div>
           <p className="text-[#1e3a5f]/70 text-sm leading-relaxed max-w-xs mb-8">
             이름을 불러주는 따뜻한 교회.
             <br />
-            충북 청주시 상당구에서 15명의 가족이
+            충북 청주시 상당구에서
             <br />
             하나님의 사랑 안에서 함께 성장합니다.
           </p>
           <div className="flex gap-4">
             <a
-              href="#"
+              href="https://www.youtube.com/@%EB%8F%99%EB%82%A8%EC%83%9D%EB%AA%85%EC%9D%98%EB%B9%9B%EA%B5%90%ED%9A%8C"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full border border-[#c4c6cf] flex items-center justify-center text-[#022448] hover:bg-[#022448] hover:text-white transition-all"
@@ -50,7 +50,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="#"
+              href="https://blog.naver.com/hey0190"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full border border-[#c4c6cf] flex items-center justify-center text-[#022448] hover:bg-[#022448] hover:text-white transition-all"
@@ -104,14 +104,14 @@ export function Footer() {
               오시는 길
             </h5>
             <p className="text-[#1e3a5f]/70 text-sm leading-relaxed mb-2">
-              충북 청주시 상당구
+              충북 청주시 상당구 중고개로125번길 29
               <br />
               동남생명의빛교회
             </p>
             <p className="text-[#1e3a5f]/70 text-sm">담임목사 홍은익</p>
           </div>
           <div className="pt-8 text-xs text-[#1e3a5f]/50 md:text-right">
-            © {new Date().getFullYear()} 동남생명의빛교회. All rights reserved.
+            © {new Date().getFullYear()} Light of Life Church. All rights reserved.
           </div>
         </div>
       </div>

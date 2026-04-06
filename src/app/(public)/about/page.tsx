@@ -5,7 +5,7 @@ import Image from "next/image"
 
 export const metadata: Metadata = generatePageMetadata(
   "교회 소개",
-  "동남생명의빛교회는 청주시 상당구에 위치한 15명 가족 공동체 교회입니다.",
+  "동남생명의빛교회는 청주시 상당구에 위치한 가족 공동체 교회입니다.",
   "/about"
 )
 
@@ -64,7 +64,7 @@ export default async function AboutPage() {
             </h2>
             <p className="text-[#43474e] leading-relaxed text-lg">
               {settings.church_description ||
-                "동남생명의빛교회는 충북 청주시 상당구에 위치한 작지만 따뜻한 가족 공동체 교회입니다. 15명의 성도가 서로의 이름을 불러주며, 하나님의 사랑 안에서 함께 성장하고 있습니다."}
+                "동남생명의빛교회는 충북 청주시 상당구에 위치한 작지만 따뜻한 가족 공동체 교회입니다. 성도들이 서로의 이름을 불러주며, 하나님의 사랑 안에서 함께 성장하고 있습니다."}
             </p>
           </div>
           <div className="md:col-span-7 space-y-8">

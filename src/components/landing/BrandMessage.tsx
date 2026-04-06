@@ -20,8 +20,8 @@ export function BrandMessage() {
           — 동남생명의빛교회 비전
         </p>
         <p className="mt-8 text-[#43474e] text-lg leading-relaxed max-w-2xl mx-auto">
-          15명의 가족이 서로의 이름을 부르며, 하나님의 사랑 안에서 함께
-          성장하는 공동체입니다.
+          서로의 이름을 부르며, 하나님의 사랑 안에서 함께
+          성장하는 가족 공동체입니다.
         </p>
       </motion.div>
     </section>

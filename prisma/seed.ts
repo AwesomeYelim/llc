@@ -28,12 +28,12 @@ async function main() {
   // ──────────────────────────────────────────────
   const defaultSettings: Record<string, string> = {
     church_name: "동남생명의빛교회",
-    church_address: "충북 청주시 상당구",
+    church_address: "충북 청주시 상당구 중고개로125번길 29",
     church_phone: "",
     pastor_name: "홍은익",
     vision: "하나님의 일을 성공시켜라",
-    youtube_url: "",
-    blog_url: "",
+    youtube_url: "https://www.youtube.com/@%EB%8F%99%EB%82%A8%EC%83%9D%EB%AA%85%EC%9D%98%EB%B9%9B%EA%B5%90%ED%9A%8C",
+    blog_url: "https://blog.naver.com/hey0190",
     sunday_main_time: "주일 오전 11:00",
     sunday_school_time: "주일 오전 9:30",
     wednesday_time: "수요일 저녁 7:30",

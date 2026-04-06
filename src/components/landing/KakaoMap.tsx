@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
-  const naverQuery = encodeURIComponent(address || "충북 청주시 상당구 동남생명의빛교회")
+  const naverQuery = encodeURIComponent(address || "충북 청주시 상당구 중고개로125번길 29")
   // Naver map embed - map only (no sidebar)
   const naverMapUrl = `https://map.naver.com/p/search/${naverQuery}?c=15.00,0,0,0,dh`
 
@@ -32,7 +32,7 @@ export function KakaoMap({ address }: { address: string }) {
               <div>
                 <h4 className="font-serif text-xl text-[#022448] mb-1">위치</h4>
                 <p className="text-[#43474e] leading-relaxed">
-                  {address || "충북 청주시 상당구"}
+                  {address || "충북 청주시 상당구 중고개로125번길 29"}
                   <br />
                   동남생명의빛교회
                 </p>

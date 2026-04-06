@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 export const SITE_NAME = "동남생명의빛교회"
 export const SITE_DESCRIPTION =
-  "청주시 상당구 15명 가족 공동체, 동남생명의빛교회. 이름을 불러주는 따뜻한 교회입니다."
+  "청주시 상당구 가족 공동체, 동남생명의빛교회. 이름을 불러주는 따뜻한 교회입니다."
 export const SITE_URL = "https://dongnam.church"
 export const SITE_KEYWORDS = [
   "청주 상당구 교회",
@@ -53,7 +53,7 @@ export function churchJsonLd() {
       addressLocality: "청주시",
       addressRegion: "충청북도",
       addressCountry: "KR",
-      streetAddress: "상당구",
+      streetAddress: "상당구 중고개로125번길 29",
     },
     founder: {
       "@type": "Person",

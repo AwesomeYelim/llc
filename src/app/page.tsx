@@ -39,7 +39,7 @@ export default async function HomePage() {
           youtubeUrl={settings.youtube_url}
           blogUrl={settings.blog_url}
         />
-        <KakaoMap address={settings.church_address || "충북 청주시 상당구"} />
+        <KakaoMap address={settings.church_address || "충북 청주시 상당구 중고개로125번길 29"} />
         <CTA />
       </main>
       <Footer />

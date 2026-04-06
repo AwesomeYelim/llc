@@ -138,7 +138,7 @@ export function ServiceTimes({ settings }: ServiceTimesProps) {
             </div>
             <div className="flex items-center gap-2 text-[#795900] font-semibold shrink-0">
               <span className="material-symbols-outlined">diversity_3</span>
-              15명의 가족
+              따뜻한 가족
             </div>
           </motion.div>
         </div>

@@ -59,7 +59,7 @@ export function Navbar() {
                 showDark ? "text-[#022448]" : "text-white"
               )}
             >
-              동남생명의빛교회
+              Light of Life Church
             </span>
           </Link>
 
