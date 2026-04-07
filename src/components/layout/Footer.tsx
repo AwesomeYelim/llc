@@ -110,7 +110,7 @@ export function Footer() {
             <p className="text-[#1e3a5f]/70 text-sm mb-6">담임목사 홍은익</p>
 
             {/* 교단 정보 */}
-            <div className="pt-4 border-t border-[#e4e2df]">
+            <div className="pt-4 border-t border-[#e4e2df] flex items-center gap-3">
               <Image
                 src="/images/denomination_logo.png"
                 alt="대한예수교장로회"
@@ -118,6 +118,9 @@ export function Footer() {
                 height={42}
                 className="w-7 h-auto object-contain"
               />
+              <span className="text-[#1e3a5f]/70 text-sm font-medium">
+                대한예수교장로회
+              </span>
             </div>
           </div>
           <div className="pt-8 text-xs text-[#1e3a5f]/50 md:text-right">
