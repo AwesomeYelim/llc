@@ -11,7 +11,7 @@ export default async function DashboardPage() {
 
   const [sermonCount, columnCount, praiseCount, bulletinCount, galleryCount] =
     await Promise.all([
-      prisma.sermon.count(),
+      prisma.sermon.count({ where: { youtubeId: { not: null } } }),
       prisma.column.count(),
       prisma.praiseConti.count(),
       prisma.bulletin.count(),
