@@ -8,38 +8,71 @@ interface FileUploadProps {
   accept?: string
   maxSize?: number // bytes
   onFileSelect: (file: File) => void
+  onFilesSelect?: (files: File[]) => void
+  multiple?: boolean
   label?: string
   className?: string
 }
 
-export function FileUpload({ accept, maxSize, onFileSelect, label, className }: FileUploadProps) {
+export function FileUpload({
+  accept,
+  maxSize,
+  onFileSelect,
+  onFilesSelect,
+  multiple,
+  label,
+  className,
+}: FileUploadProps) {
   const [dragOver, setDragOver] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleFile = useCallback(
-    (file: File) => {
+  const handleFiles = useCallback(
+    (files: FileList | File[]) => {
       setError(null)
-      if (maxSize && file.size > maxSize) {
-        setError(`파일 크기가 ${formatFileSize(maxSize)}를 초과합니다.`)
-        return
+      const fileArray = Array.from(files)
+      const valid: File[] = []
+
+      for (const file of fileArray) {
+        if (maxSize && file.size > maxSize) {
+          setError(`${file.name}: 파일 크기가 ${formatFileSize(maxSize)}를 초과합니다.`)
+          continue
+        }
+        valid.push(file)
       }
-      setSelectedFile(file)
-      onFileSelect(file)
+
+      if (valid.length === 0) return
+
+      if (multiple && onFilesSelect) {
+        setSelectedFiles(valid)
+        onFilesSelect(valid)
+      } else {
+        setSelectedFiles([valid[0]])
+        onFileSelect(valid[0])
+      }
     },
-    [maxSize, onFileSelect]
+    [maxSize, onFileSelect, onFilesSelect, multiple]
   )
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
       setDragOver(false)
-      const file = e.dataTransfer.files[0]
-      if (file) handleFile(file)
+      handleFiles(e.dataTransfer.files)
     },
-    [handleFile]
+    [handleFiles]
   )
+
+  const removeFile = (index: number) => {
+    const updated = selectedFiles.filter((_, i) => i !== index)
+    setSelectedFiles(updated)
+    if (multiple && onFilesSelect) {
+      onFilesSelect(updated)
+    } else if (updated.length > 0) {
+      onFileSelect(updated[0])
+    }
+  }
 
   return (
     <div className={className}>
@@ -61,20 +94,37 @@ export function FileUpload({ accept, maxSize, onFileSelect, label, className }: 
           ref={inputRef}
           type="file"
           accept={accept}
+          multiple={multiple}
           className="hidden"
           onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) handleFile(file)
+            if (e.target.files) handleFiles(e.target.files)
           }}
         />
-        {selectedFile ? (
-          <div className="text-sm">
-            <p className="font-medium text-gray-900">{selectedFile.name}</p>
-            <p className="text-gray-500">{formatFileSize(selectedFile.size)}</p>
+        {selectedFiles.length > 0 ? (
+          <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+            {selectedFiles.map((file, i) => (
+              <div key={i} className="flex items-center justify-between text-sm bg-gray-50 rounded px-3 py-2">
+                <div>
+                  <span className="font-medium text-gray-900">{file.name}</span>
+                  <span className="text-gray-400 ml-2">{formatFileSize(file.size)}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeFile(i)}
+                  className="text-red-400 hover:text-red-600 text-xs ml-2"
+                >
+                  삭제
+                </button>
+              </div>
+            ))}
+            <p className="text-xs text-gray-400 pt-1">클릭하여 추가하거나 파일을 드래그</p>
           </div>
         ) : (
           <div className="text-sm text-gray-500">
-            <p className="mb-1">파일을 드래그하거나 클릭하여 업로드</p>
+            <span className="material-symbols-outlined text-3xl text-gray-300 mb-2 block">upload_file</span>
+            <p className="mb-1">
+              {multiple ? "파일들을 드래그하거나 클릭하여 업로드" : "파일을 드래그하거나 클릭하여 업로드"}
+            </p>
             {accept && <p className="text-xs text-gray-400">허용 형식: {accept}</p>}
           </div>
         )}
