@@ -29,7 +29,7 @@ export default async function DashboardPage() {
     <AdminLayout>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
-        <p className="text-gray-500 mt-1">동남생명의빛교회 관리자 페이지</p>
+        <p className="text-gray-500 mt-1">동남 생명의 빛 교회 관리자 페이지</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

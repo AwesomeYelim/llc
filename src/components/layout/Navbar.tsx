@@ -9,10 +9,9 @@ import { cn } from "@/lib/utils"
 const navLinks = [
   { href: "/about", label: "교회소개" },
   { href: "/sermons", label: "설교영상" },
-  { href: "/blog", label: "블로그" },
+  { href: "/columns", label: "설교칼럼" },
   { href: "/praise", label: "찬양콘티" },
   { href: "/bulletin", label: "주보" },
-  { href: "/columns", label: "설교칼럼" },
 ]
 
 export function Navbar() {

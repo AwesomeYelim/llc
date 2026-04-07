@@ -4,13 +4,12 @@ import Image from "next/image"
 const navLinks = [
   { href: "/about", label: "교회소개" },
   { href: "/sermons", label: "설교영상" },
-  { href: "/blog", label: "블로그" },
+  { href: "/columns", label: "설교칼럼" },
 ]
 
 const infoLinks = [
   { href: "/praise", label: "찬양콘티" },
   { href: "/bulletin", label: "주보" },
-  { href: "/columns", label: "설교칼럼" },
 ]
 
 export function Footer() {
@@ -21,7 +20,7 @@ export function Footer() {
           <div className="flex items-center gap-3 mb-6">
             <Image
               src="/images/logo_dark.png"
-              alt="동남생명의빛교회"
+              alt="동남 생명의 빛 교회"
               width={40}
               height={40}
               className="w-10 h-10 object-contain"
@@ -106,9 +105,25 @@ export function Footer() {
             <p className="text-[#1e3a5f]/70 text-sm leading-relaxed mb-2">
               충북 청주시 상당구 중고개로125번길 29
               <br />
-              동남생명의빛교회
+              동남 생명의 빛 교회
             </p>
-            <p className="text-[#1e3a5f]/70 text-sm">담임목사 홍은익</p>
+            <p className="text-[#1e3a5f]/70 text-sm mb-6">담임목사 홍은익</p>
+
+            {/* 교단 정보 */}
+            <div className="flex items-center gap-3 pt-4 border-t border-[#e4e2df]">
+              <Image
+                src="/images/denomination_logo.png"
+                alt="대한예수교장로회 통합"
+                width={32}
+                height={48}
+                className="w-8 h-auto object-contain"
+              />
+              <p className="text-[#1e3a5f]/60 text-xs leading-relaxed">
+                대한예수교장로회
+                <br />
+                (통합)
+              </p>
+            </div>
           </div>
           <div className="pt-8 text-xs text-[#1e3a5f]/50 md:text-right">
             © {new Date().getFullYear()} Light of Life Church. All rights reserved.

@@ -8,7 +8,7 @@ interface ServiceTimesProps {
 
 const services = [
   { key: "sunday_main_time", label: "주일예배", day: "매주 일요일", default: "오전 11:00", icon: "church" },
-  { key: "sunday_school_time", label: "주일학교", day: "매주 일요일", default: "오전 9:30", icon: "school" },
+  { key: "sunday_afternoon_time", label: "찬양예배", day: "매주 일요일", default: "오후 2:00", icon: "music_note" },
   { key: "wednesday_time", label: "수요예배", day: "매주 수요일", default: "저녁 7:30", icon: "auto_awesome" },
   { key: "friday_time", label: "금요예배", day: "매주 금요일", default: "저녁 8:00", icon: "nights_stay" },
 ]

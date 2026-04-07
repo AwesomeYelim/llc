@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#faf8f5] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#1e3a5f]">동남생명의빛교회</h1>
+          <h1 className="text-2xl font-bold text-[#1e3a5f]">동남 생명의 빛 교회</h1>
           <p className="text-gray-500 mt-2">관리자 로그인</p>
         </div>
 

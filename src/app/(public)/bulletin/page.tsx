@@ -5,7 +5,7 @@ import { formatDate, formatFileSize } from "@/lib/utils"
 
 export const metadata: Metadata = generatePageMetadata(
   "주보 & 예배 PPT",
-  "동남생명의빛교회 주보와 예배 PPT를 확인하세요.",
+  "동남 생명의 빛 교회 주보와 예배 PPT를 확인하세요.",
   "/bulletin"
 )
 

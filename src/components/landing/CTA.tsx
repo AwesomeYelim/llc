@@ -18,7 +18,7 @@ export function CTA() {
           생명의 빛을 경험하세요
         </h2>
         <p className="text-[#8aa4cf] text-lg mb-10 max-w-2xl mx-auto relative z-10">
-          작지만 따뜻한 가족 공동체, 동남생명의빛교회에서
+          작지만 따뜻한 가족 공동체, 동남 생명의 빛 교회에서
           <br />
           하나님의 사랑을 경험해 보세요.
         </p>

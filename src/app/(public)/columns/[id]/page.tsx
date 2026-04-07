@@ -95,7 +95,7 @@ export default async function ColumnDetailPage({ params }: Props) {
                 홍은익 담임목사
               </h4>
               <p className="text-[#43474e] text-sm leading-relaxed">
-                동남생명의빛교회 담임목사. 말씀 중심의 목회를 통해 성도들이 하나님의 일을 성공시키는 삶을 살도록 인도합니다.
+                동남 생명의 빛 교회 담임목사. 말씀 중심의 목회를 통해 성도들이 하나님의 일을 성공시키는 삶을 살도록 인도합니다.
               </p>
             </div>
           </section>

@@ -5,7 +5,7 @@ import Image from "next/image"
 
 export const metadata: Metadata = generatePageMetadata(
   "교회 소개",
-  "동남생명의빛교회는 청주시 상당구에 위치한 가족 공동체 교회입니다.",
+  "동남 생명의 빛 교회는 청주시 상당구에 위치한 가족 공동체 교회입니다.",
   "/about"
 )
 
@@ -31,7 +31,7 @@ export default async function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#022448]/80 to-[#1e3a5f]/90 z-10" />
           <Image
             src="/images/after_worship.png"
-            alt="동남생명의빛교회"
+            alt="동남 생명의 빛 교회"
             fill
             className="object-cover"
             priority
@@ -64,7 +64,7 @@ export default async function AboutPage() {
             </h2>
             <p className="text-[#43474e] leading-relaxed text-lg">
               {settings.church_description ||
-                "동남생명의빛교회는 충북 청주시 상당구에 위치한 작지만 따뜻한 가족 공동체 교회입니다. 성도들이 서로의 이름을 불러주며, 하나님의 사랑 안에서 함께 성장하고 있습니다."}
+                "동남 생명의 빛 교회는 충북 청주시 상당구에 위치한 작지만 따뜻한 가족 공동체 교회입니다. 성도들이 서로의 이름을 불러주며, 하나님의 사랑 안에서 함께 성장하고 있습니다."}
             </p>
           </div>
           <div className="md:col-span-7 space-y-8">
@@ -94,7 +94,7 @@ export default async function AboutPage() {
             &ldquo;{settings.vision || "하나님의 일을 성공시켜라"}&rdquo;
           </blockquote>
           <p className="mt-6 text-[#795900] uppercase tracking-widest text-sm font-semibold">
-            — 동남생명의빛교회 비전
+            — 동남 생명의 빛 교회 비전
           </p>
         </div>
       </section>

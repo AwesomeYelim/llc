@@ -11,7 +11,7 @@ export function Hero() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/main_worship.png"
-          alt="동남생명의빛교회 예배당"
+          alt="동남 생명의 빛 교회 예배당"
           fill
           className="object-cover"
           priority
@@ -27,7 +27,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4"
           >
-            동남생명의빛교회
+            동남 생명의 빛 교회
           </motion.h1>
 
           <motion.p

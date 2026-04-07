@@ -6,7 +6,7 @@ import { DownloadButton } from "@/components/DownloadButton"
 
 export const metadata: Metadata = generatePageMetadata(
   "찬양 콘티",
-  "동남생명의빛교회 찬양 콘티를 무료로 다운로드하세요.",
+  "동남 생명의 빛 교회 찬양 콘티를 무료로 다운로드하세요.",
   "/praise"
 )
 

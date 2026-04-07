@@ -17,7 +17,7 @@ export function BrandMessage() {
           &ldquo;하나님의 일을 성공시켜라&rdquo;
         </blockquote>
         <p className="mt-6 text-[#795900] font-semibold uppercase tracking-widest text-sm">
-          — 동남생명의빛교회 비전
+          — 동남 생명의 빛 교회 비전
         </p>
         <p className="mt-8 text-[#43474e] text-lg leading-relaxed max-w-2xl mx-auto">
           서로의 이름을 부르며, 하나님의 사랑 안에서 함께

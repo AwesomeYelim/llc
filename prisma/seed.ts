@@ -9,7 +9,7 @@ async function main() {
   // ──────────────────────────────────────────────
   // 1. Admin user
   // ──────────────────────────────────────────────
-  const hashedPassword = await bcrypt.hash("admin1234", 12);
+  const hashedPassword = await bcrypt.hash("Hyl0115!", 12);
 
   const admin = await prisma.admin.upsert({
     where: { email: "admin@dongnam.church" },
@@ -27,7 +27,7 @@ async function main() {
   // 2. Default site settings
   // ──────────────────────────────────────────────
   const defaultSettings: Record<string, string> = {
-    church_name: "동남생명의빛교회",
+    church_name: "동남 생명의 빛 교회",
     church_address: "충북 청주시 상당구 중고개로125번길 29",
     church_phone: "",
     pastor_name: "홍은익",
@@ -35,7 +35,7 @@ async function main() {
     youtube_url: "https://www.youtube.com/@%EB%8F%99%EB%82%A8%EC%83%9D%EB%AA%85%EC%9D%98%EB%B9%9B%EA%B5%90%ED%9A%8C",
     blog_url: "https://blog.naver.com/hey0190",
     sunday_main_time: "주일 오전 11:00",
-    sunday_school_time: "주일 오전 9:30",
+    sunday_afternoon_time: "주일 오후 2:00",
     wednesday_time: "수요일 저녁 7:30",
     friday_time: "금요일 저녁 8:00",
     special_time: "",

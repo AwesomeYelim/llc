@@ -47,7 +47,7 @@ export function KakaoMap({ address }: { address: string }) {
                   <p className="text-[#43474e] text-sm leading-relaxed">
                     {fullAddress}
                     <br />
-                    동남생명의빛교회
+                    동남 생명의 빛 교회
                   </p>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export function KakaoMap({ address }: { address: string }) {
             </a>
           </motion.div>
 
-          {/* Map - 3 cols */}
+          {/* Map - 3 cols, sidebar hidden via CSS offset */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -88,9 +88,7 @@ export function KakaoMap({ address }: { address: string }) {
           >
             <iframe
               src={naverMapUrl}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
+              style={{ border: 0, position: "absolute", top: 0, left: "-76px", width: "calc(100% + 76px)", height: "100%" }}
               allowFullScreen
               loading="lazy"
               title="교회 위치 - 네이버 지도"

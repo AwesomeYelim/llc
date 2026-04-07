@@ -23,7 +23,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void }) {
         <Link href="/admin/dashboard" className="text-lg font-bold">
           관리자
         </Link>
-        <p className="text-white/60 text-xs mt-1">동남생명의빛교회</p>
+        <p className="text-white/60 text-xs mt-1">동남 생명의 빛 교회</p>
       </div>
 
       <nav className="flex-1 py-4">

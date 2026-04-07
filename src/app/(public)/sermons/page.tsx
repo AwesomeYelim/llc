@@ -7,7 +7,7 @@ import { formatDate, serviceTypeLabel, getYoutubeThumbnail } from "@/lib/utils"
 
 export const metadata: Metadata = generatePageMetadata(
   "설교 영상",
-  "동남생명의빛교회 설교 영상을 온라인으로 시청하세요.",
+  "동남 생명의 빛 교회 설교 영상을 온라인으로 시청하세요.",
   "/sermons"
 )
 
