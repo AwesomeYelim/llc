@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 const menuItems = [
   { href: "/admin/dashboard", label: "대시보드", icon: "📊" },
   { href: "/admin/sermons", label: "설교 관리", icon: "🎬" },
-  { href: "/admin/praise", label: "찬양 콘티", icon: "🎵" },
+  { href: "/admin/praise", label: "찬양 콘티 & 가사 PPT", icon: "🎵" },
   { href: "/admin/bulletins", label: "주보/PPT", icon: "📋" },
   { href: "/admin/columns", label: "설교 원고", icon: "📝" },
   { href: "/admin/gallery", label: "갤러리", icon: "🖼" },

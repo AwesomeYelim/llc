@@ -17,7 +17,7 @@ export default async function AdminPraisePage() {
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">찬양 콘티 관리</h1>
+        <h1 className="text-2xl font-bold">찬양 콘티 & 가사 PPT 관리</h1>
         <Link
           href="/admin/praise/new"
           className="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg text-sm hover:bg-[#2a4a73]"

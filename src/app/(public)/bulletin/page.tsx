@@ -26,7 +26,7 @@ export default async function BulletinPage() {
               예배 자료
             </span>
           </div>
-          <h1 className="font-serif text-4xl md:text-6xl font-bold text-[#022448] mb-6 leading-tight">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight">
             주보 & 예배 PPT
           </h1>
           <p className="text-lg text-[#43474e] leading-relaxed">

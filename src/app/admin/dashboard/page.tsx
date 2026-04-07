@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   const stats = [
     { label: "설교 영상", count: sermonCount, href: "/admin/sermons", icon: "🎬" },
     { label: "설교 원고", count: columnCount, href: "/admin/columns", icon: "📝" },
-    { label: "찬양 콘티", count: praiseCount, href: "/admin/praise", icon: "🎵" },
+    { label: "찬양 콘티 & 가사 PPT", count: praiseCount, href: "/admin/praise", icon: "🎵" },
     { label: "주보/PPT", count: bulletinCount, href: "/admin/bulletins", icon: "📋" },
     { label: "갤러리", count: galleryCount, href: "/admin/gallery", icon: "🖼" },
   ]

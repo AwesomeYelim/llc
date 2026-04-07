@@ -1,8 +1,29 @@
 import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
+import { unstable_cache } from "next/cache"
 import prisma from "@/lib/prisma"
-import Link from "next/link"
-import { formatDate } from "@/lib/utils"
+import { ColumnsGrid } from "@/components/columns/ColumnsGrid"
+
+const getColumns = unstable_cache(
+  async () => {
+    const columns = await prisma.column.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { sermon: { select: { sermonDate: true } } },
+    })
+    // Strip HTML and serialize for client component
+    return columns.map((col) => ({
+      id: col.id,
+      title: col.title,
+      content: col.content.replace(/<[^>]*>/g, ""),
+      scripture: col.scripture,
+      viewCount: col.viewCount,
+      createdAt: col.createdAt.toISOString(),
+      sermonDate: col.sermon?.sermonDate?.toISOString() || null,
+    }))
+  },
+  ["columns-list"],
+  { revalidate: 300, tags: ["columns"] }
+)
 
 export const metadata: Metadata = generatePageMetadata(
   "설교 칼럼",
@@ -11,10 +32,7 @@ export const metadata: Metadata = generatePageMetadata(
 )
 
 export default async function ColumnsPage() {
-  const columns = await prisma.column.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { sermon: { select: { sermonDate: true } } },
-  })
+  const columns = await getColumns()
 
   return (
     <div>
@@ -35,58 +53,7 @@ export default async function ColumnsPage() {
         </div>
       </header>
 
-      {/* Columns Grid */}
-      {columns.length > 0 && (
-        <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            {columns.map((col, i) => (
-              <Link
-                key={col.id}
-                href={`/columns/${col.id}`}
-                className={`group ${i === 0 ? "md:col-span-2" : ""}`}
-              >
-                <article
-                  className={`bg-white rounded-xl border border-[#c4c6cf]/20 overflow-hidden hover:shadow-lg transition-all duration-500 ${
-                    i === 0 ? "p-8 lg:p-12" : "p-6 lg:p-8"
-                  }`}
-                >
-                  {col.scripture && (
-                    <span className="text-[#795900] text-xs font-bold tracking-widest uppercase mb-3 block">
-                      {col.scripture}
-                    </span>
-                  )}
-                  <h3
-                    className={`font-serif font-bold text-[#022448] group-hover:text-[#795900] transition-colors leading-snug ${
-                      i === 0 ? "text-2xl lg:text-4xl mb-4" : "text-xl lg:text-2xl mb-3"
-                    }`}
-                  >
-                    {col.title}
-                  </h3>
-                  <p className={`text-[#43474e] leading-relaxed line-clamp-3 ${i === 0 ? "text-base lg:text-lg" : "text-sm"}`}>
-                    {col.content.replace(/<[^>]*>/g, "").slice(0, i === 0 ? 300 : 150)}...
-                  </p>
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#e4e2df]">
-                    <span className="text-xs text-[#43474e]">
-                      {formatDate(col.sermon?.sermonDate || col.createdAt)}
-                    </span>
-                    <span className="text-[#795900] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                      읽기
-                      <span className="material-symbols-outlined text-base">arrow_forward</span>
-                    </span>
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {columns.length === 0 && (
-        <div className="text-center py-24 max-w-screen-2xl mx-auto px-6 lg:px-12">
-          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4">article</span>
-          <p className="text-[#43474e]">등록된 글이 없습니다.</p>
-        </div>
-      )}
+      <ColumnsGrid columns={columns} />
     </div>
   )
 }

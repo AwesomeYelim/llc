@@ -9,7 +9,7 @@ export default async function NewPraisePage() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">찬양 콘티 업로드</h1>
+      <h1 className="text-2xl font-bold mb-6">찬양 콘티 & 가사 PPT 업로드</h1>
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <FileUploadForm type="praise" />
       </div>

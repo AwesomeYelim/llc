@@ -35,17 +35,22 @@ export default function RootLayout({
   return (
     <html lang="ko" className="scroll-smooth">
       <head>
+        {/* Preconnect to font CDNs for faster loading */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Primary font - high priority */}
         <link
           rel="stylesheet"
-          as="style"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
         />
+        {/* Serif font and icons - swap to prevent blocking */}
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap"
           rel="stylesheet"
         />
         <link rel="manifest" href="/manifest.json" />

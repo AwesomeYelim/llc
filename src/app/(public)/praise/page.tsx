@@ -5,8 +5,8 @@ import { formatDate } from "@/lib/utils"
 import { DownloadButton } from "@/components/DownloadButton"
 
 export const metadata: Metadata = generatePageMetadata(
-  "찬양 콘티",
-  "동남 생명의 빛 교회 찬양 콘티를 무료로 다운로드하세요.",
+  "찬양 콘티 & 가사 PPT",
+  "동남 생명의 빛 교회 찬양 콘티와 가사 PPT를 무료로 다운로드하세요.",
   "/praise"
 )
 
@@ -29,11 +29,11 @@ export default async function PraisePage() {
                 예배 리소스
               </span>
             </div>
-            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-[#022448] mb-6 leading-tight">
-              찬양 콘티
+            <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight">
+              찬양 콘티 & 가사 PPT
             </h1>
             <p className="text-lg text-[#43474e] leading-relaxed max-w-xl">
-              매주 예배에서 사용된 찬양 콘티를 확인하고 자유롭게 다운로드하세요.
+              매주 예배에서 사용된 찬양 콘티와 가사 PPT를 확인하고 자유롭게 다운로드하세요.
             </p>
           </div>
           <div className="flex items-center gap-4 pb-2">

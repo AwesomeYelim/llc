@@ -98,7 +98,7 @@ html {
   color: #1b1c1a;
 }
 
-.column-content p:first-of-type::first-letter {
+.column-content-first p:first-of-type::first-letter {
   float: left;
   font-size: 4.5rem;
   line-height: 1;

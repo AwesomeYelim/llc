@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache"
 import prisma from "@/lib/prisma"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
@@ -10,21 +11,26 @@ import { QuickLinks } from "@/components/landing/QuickLinks"
 import { CTA } from "@/components/landing/CTA"
 import { JsonLd } from "@/components/seo/JsonLd"
 
-async function getSettings() {
-  const settings = await prisma.siteSetting.findMany()
-  const map: Record<string, string> = {}
-  settings.forEach((s) => (map[s.key] = s.value))
-  return map
-}
+const getHomeData = unstable_cache(
+  async () => {
+    const [settingsArr, sermons] = await Promise.all([
+      prisma.siteSetting.findMany(),
+      prisma.sermon.findMany({
+        where: { youtubeId: { not: null } },
+        orderBy: { sermonDate: "desc" },
+        take: 3,
+      }),
+    ])
+    const settings: Record<string, string> = {}
+    settingsArr.forEach((s) => (settings[s.key] = s.value))
+    return { settings, sermons }
+  },
+  ["home-data"],
+  { revalidate: 300, tags: ["home"] }
+)
 
 export default async function HomePage() {
-  const [settings, sermons] = await Promise.all([
-    getSettings(),
-    prisma.sermon.findMany({
-      orderBy: { sermonDate: "desc" },
-      take: 3,
-    }),
-  ])
+  const { settings, sermons } = await getHomeData()
 
   return (
     <>

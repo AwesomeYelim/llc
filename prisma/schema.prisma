@@ -60,6 +60,9 @@ model Sermon {
 
   columns     Column[]
 
+  @@index([sermonDate])
+  @@index([serviceType])
+  @@index([youtubeId])
   @@map("sermons")
 }
 
@@ -71,9 +74,13 @@ model Column {
   sermonId      Int?
   sermon        Sermon?  @relation(fields: [sermonId], references: [id])
   coverImageUrl String?
+  viewCount     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  @@index([createdAt])
+  @@index([sermonId])
+  @@index([viewCount])
   @@map("columns")
 }
 

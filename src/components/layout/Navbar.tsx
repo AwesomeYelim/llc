@@ -10,7 +10,7 @@ const navLinks = [
   { href: "/about", label: "교회소개" },
   { href: "/sermons", label: "설교영상" },
   { href: "/columns", label: "설교칼럼" },
-  { href: "/praise", label: "찬양콘티" },
+  { href: "/praise", label: "찬양" },
   { href: "/bulletin", label: "주보" },
 ]
 
