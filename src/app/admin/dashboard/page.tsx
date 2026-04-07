@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { AdminLayout } from "@/components/layout/AdminLayout"
 import Link from "next/link"
+import { SyncButtons } from "@/components/admin/SyncButtons"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -48,6 +49,10 @@ export default async function DashboardPage() {
             </div>
           </Link>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <SyncButtons />
       </div>
 
       <div className="mt-8 bg-white rounded-xl border border-gray-100 p-6">
