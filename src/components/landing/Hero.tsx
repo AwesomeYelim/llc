@@ -10,7 +10,7 @@ export function Hero() {
       {/* Background photo */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/main_worship.png"
+          src="/images/hero_bg.jpg"
           alt="동남 생명의 빛 교회 예배당"
           fill
           className="object-cover"

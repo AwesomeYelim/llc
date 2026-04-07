@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
-  const fullAddress = address || "충북 청주시 상당구 중고개로125번길 29"
+  const fullAddress = "충북 청주시 상당구 중고개로125번길 29"
   // 교회명으로 검색하면 네이버 지도에서 정확한 위치 핀이 찍힘
   // 네이버 지도에 등록된 정식 명칭으로 검색해야 교회 핀이 정확히 표시됨
   const naverMapUrl = `https://map.naver.com/p/search/동남생명의빛교회?c=17.00,0,0,0,dh`
@@ -88,7 +88,7 @@ export function KakaoMap({ address }: { address: string }) {
           >
             <iframe
               src={naverMapUrl}
-              style={{ border: 0, position: "absolute", top: 0, left: "-400px", width: "calc(100% + 400px)", height: "100%" }}
+              style={{ border: 0, position: "absolute", top: 0, left: "-500px", width: "calc(100% + 500px)", height: "100%" }}
               allowFullScreen
               loading="lazy"
               title="교회 위치 - 네이버 지도"
