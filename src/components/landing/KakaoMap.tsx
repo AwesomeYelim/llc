@@ -4,9 +4,8 @@ import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
   const fullAddress = address || "충북 청주시 상당구 중고개로125번길 29"
-  const naverQuery = encodeURIComponent(fullAddress)
-  // Naver map embed - entry/address mode shows map only without sidebar
-  const naverMapUrl = `https://map.naver.com/p/entry/address/${naverQuery}?c=17.00,0,0,0,dh`
+  // 교회명으로 검색하면 네이버 지도에서 정확한 위치 핀이 찍힘
+  const naverMapUrl = `https://map.naver.com/p/search/충북 청주시 상당구 중고개로125번길 29 동남생명의빛교회?c=17.00,0,0,0,dh`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
@@ -68,7 +67,7 @@ export function KakaoMap({ address }: { address: string }) {
               </div>
             </div>
             <a
-              href={`https://map.naver.com/p/search/${naverQuery}`}
+              href="https://map.naver.com/p/search/충북 청주시 상당구 중고개로125번길 29 동남생명의빛교회"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-[#022448] font-bold hover:text-[#795900] transition-colors mt-8 text-sm"
@@ -88,7 +87,7 @@ export function KakaoMap({ address }: { address: string }) {
           >
             <iframe
               src={naverMapUrl}
-              style={{ border: 0, position: "absolute", top: 0, left: "-76px", width: "calc(100% + 76px)", height: "100%" }}
+              style={{ border: 0, position: "absolute", top: 0, left: "-90px", width: "calc(100% + 90px)", height: "100%" }}
               allowFullScreen
               loading="lazy"
               title="교회 위치 - 네이버 지도"
