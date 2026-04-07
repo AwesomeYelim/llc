@@ -105,7 +105,7 @@ export function Footer() {
             <p className="text-[#1e3a5f]/70 text-sm leading-relaxed mb-2">
               충북 청주시 상당구 중고개로125번길 29
               <br />
-              동남 생명의 빛 교회
+              생명의 빛 교회
             </p>
             <p className="text-[#1e3a5f]/70 text-sm mb-6">담임목사 홍은익</p>
 
