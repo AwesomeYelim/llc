@@ -11,17 +11,10 @@ export const metadata: Metadata = generatePageMetadata(
 )
 
 export default async function ColumnsPage() {
-  const [columns, sermons] = await Promise.all([
-    prisma.column.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { sermon: { select: { sermonDate: true } } },
-    }),
-    prisma.sermon.findMany({
-      where: { summary: { not: null } },
-      orderBy: { sermonDate: "desc" },
-      take: 20,
-    }),
-  ])
+  const columns = await prisma.column.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { sermon: { select: { sermonDate: true } } },
+  })
 
   return (
     <div>
@@ -44,10 +37,7 @@ export default async function ColumnsPage() {
 
       {/* Columns Grid */}
       {columns.length > 0 && (
-        <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-16">
-          <h2 className="font-serif text-2xl font-bold text-[#022448] mb-8 border-b-2 border-[#795900] inline-block pb-1">
-            설교 원고
-          </h2>
+        <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {columns.map((col, i) => (
               <Link
@@ -91,58 +81,7 @@ export default async function ColumnsPage() {
         </section>
       )}
 
-      {/* Sermon Summaries (Blog) */}
-      {sermons.length > 0 && (
-        <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
-          <h2 className="font-serif text-2xl font-bold text-[#022448] mb-8 border-b-2 border-[#795900] inline-block pb-1">
-            설교 요약
-          </h2>
-          <div className="space-y-6">
-            {sermons.map((sermon) => (
-              <a
-                key={sermon.id}
-                href={sermon.blogUrl || `/blog/${sermon.id}`}
-                target={sermon.blogUrl ? "_blank" : undefined}
-                rel={sermon.blogUrl ? "noopener noreferrer" : undefined}
-                className="block bg-white rounded-xl border border-[#c4c6cf]/20 p-6 lg:p-8 hover:shadow-md hover:border-[#795900]/20 transition-all group"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <span className="text-[#795900] text-xs font-bold tracking-widest uppercase mb-2 block">
-                      {sermon.scripture}
-                    </span>
-                    <h3 className="text-xl lg:text-2xl font-serif font-bold text-[#022448] mb-3 group-hover:text-[#795900] transition-colors">
-                      {sermon.title}
-                    </h3>
-                    {sermon.summary && (
-                      <p className="text-[#43474e] text-sm leading-relaxed line-clamp-3">
-                        {sermon.summary}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-4 mt-4 text-xs text-[#43474e]">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">calendar_today</span>
-                        {formatDate(sermon.sermonDate)}
-                      </span>
-                      {sermon.blogUrl && (
-                        <span className="flex items-center gap-1 text-[#795900]">
-                          <span className="material-symbols-outlined text-sm">open_in_new</span>
-                          네이버 블로그
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <span className="material-symbols-outlined text-[#c4c6cf] group-hover:text-[#795900] transition-colors shrink-0">
-                    {sermon.blogUrl ? "open_in_new" : "arrow_forward"}
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {columns.length === 0 && sermons.length === 0 && (
+      {columns.length === 0 && (
         <div className="text-center py-24 max-w-screen-2xl mx-auto px-6 lg:px-12">
           <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4">article</span>
           <p className="text-[#43474e]">등록된 글이 없습니다.</p>

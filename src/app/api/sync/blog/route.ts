@@ -46,22 +46,59 @@ function cleanBlogUrl(url: string): string {
   return url.replace(/\?fromRss.*$/, "")
 }
 
-function cleanDescription(desc: string): string {
-  return desc
-    .replace(/<[^>]*>/g, "")
-    .replace(/&[a-z]+;/gi, " ")
-    .trim()
-    .slice(0, 500)
+function extractPostId(url: string): string {
+  const match = url.match(/\/(\d+)(?:\?|$)/)
+  return match?.[1] ?? ""
 }
 
 function extractScripture(text: string): string {
   const match = text.match(/본문\s*[:：]\s*([^\n(]+)/i)
   if (match) return match[1].trim()
+  return ""
+}
 
-  const bibleMatch = text.match(
-    /([가-힣]{1,3}\s*\d{1,3}\s*[:\s]\s*\d{1,3}[-~]?\s*\d{0,3})/
-  )
-  return bibleMatch?.[1]?.trim() ?? ""
+async function fetchBlogContent(postId: string): Promise<string> {
+  const viewUrl = `https://blog.naver.com/PostView.naver?blogId=${BLOG_ID}&logNo=${postId}&redirect=Dlog&widgetTypeCall=true`
+  const res = await fetch(viewUrl)
+  if (!res.ok) return ""
+
+  const html = await res.text()
+
+  // 텍스트 단락 추출
+  const paragraphs: string[] = []
+  const re = /<p class="se-text-paragraph[^"]*"[^>]*>([\s\S]*?)<\/p>/g
+  let match
+  while ((match = re.exec(html)) !== null) {
+    let text = match[1]
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .trim()
+    if (text) paragraphs.push(text)
+  }
+
+  if (paragraphs.length === 0) return ""
+
+  // HTML로 포맷팅 (가독성 좋게)
+  return paragraphs
+    .map((p) => {
+      // 성경 구절 (숫자:숫자 패턴) → 강조
+      if (/^\d+:\d+/.test(p)) {
+        return `<p class="bible-verse">${p}</p>`
+      }
+      // 소제목 느낌 (짧고 번호 포함)
+      if (/^\d+\.\s/.test(p) && p.length < 100) {
+        return `<h3>${p}</h3>`
+      }
+      // 일반 단락
+      return `<p>${p}</p>`
+    })
+    .join("\n")
 }
 
 async function syncBlog() {
@@ -71,69 +108,87 @@ async function syncBlog() {
   const xml = await res.text()
   const posts = parseRSS(xml)
 
-  const sermonPosts = posts.filter(
-    (p) => p.category === "설교" || p.category === ""
-  )
+  // 설교 카테고리만
+  const sermonPosts = posts.filter((p) => p.category === "설교")
 
   let synced = 0
   let skipped = 0
 
   for (const post of sermonPosts) {
     const blogUrl = cleanBlogUrl(post.link)
+    const postId = extractPostId(blogUrl)
+    const cleanTitle = post.title.replace(/[""]/g, "").replace(/^제목\s*[:：]\s*/, "").trim()
 
-    const existing = await prisma.sermon.findFirst({
-      where: { blogUrl },
+    // 이미 Column에 같은 제목이 있으면 스킵
+    const existingColumn = await prisma.column.findFirst({
+      where: {
+        OR: [
+          { title: cleanTitle },
+          { title: { contains: cleanTitle.slice(0, 20) } },
+        ],
+      },
     })
 
-    if (existing) {
-      if (!existing.summary && post.description) {
-        await prisma.sermon.update({
-          where: { id: existing.id },
-          data: { summary: cleanDescription(post.description) },
-        })
-      }
+    if (existingColumn) {
       skipped++
       continue
     }
 
-    // 같은 제목 매칭 시 blogUrl + summary 업데이트
-    const cleanTitle = post.title.replace(/[""]/g, "").trim()
-    const titleMatch = await prisma.sermon.findFirst({
-      where: { title: { contains: cleanTitle } },
-    })
-
-    if (titleMatch) {
-      await prisma.sermon.update({
-        where: { id: titleMatch.id },
-        data: {
-          blogUrl,
-          summary: cleanDescription(post.description),
-        },
-      })
-      synced++
+    // 전체 본문 스크래핑
+    const content = postId ? await fetchBlogContent(postId) : ""
+    if (!content) {
+      skipped++
       continue
     }
 
     const scripture = extractScripture(post.description)
     const pubDate = post.pubDate ? new Date(post.pubDate) : new Date()
 
-    await prisma.sermon.create({
-      data: {
-        title: cleanTitle,
-        scripture,
-        sermonDate: pubDate,
-        serviceType: "SUNDAY_MAIN",
-        blogUrl,
-        summary: cleanDescription(post.description),
+    // Sermon 레코드 찾기 또는 생성
+    let sermon = await prisma.sermon.findFirst({
+      where: {
+        OR: [
+          { blogUrl },
+          { title: { contains: cleanTitle.slice(0, 15) } },
+        ],
       },
     })
+
+    if (!sermon) {
+      sermon = await prisma.sermon.create({
+        data: {
+          title: cleanTitle,
+          scripture,
+          sermonDate: pubDate,
+          serviceType: "SUNDAY_MAIN",
+          blogUrl,
+          summary: post.description.replace(/<[^>]*>/g, "").slice(0, 500),
+        },
+      })
+    } else if (!sermon.blogUrl) {
+      await prisma.sermon.update({
+        where: { id: sermon.id },
+        data: { blogUrl },
+      })
+    }
+
+    // Column 생성
+    await prisma.column.create({
+      data: {
+        title: cleanTitle,
+        content,
+        scripture,
+        sermonId: sermon.id,
+      },
+    })
+
     synced++
   }
 
   return { success: true, synced, skipped, total: sermonPosts.length }
 }
 
-// Vercel Cron (매일 자동)
+// Vercel Cron
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

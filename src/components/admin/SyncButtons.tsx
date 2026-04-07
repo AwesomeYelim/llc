@@ -68,7 +68,7 @@ export function SyncButtons() {
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <h2 className="text-lg font-semibold mb-2">콘텐츠 동기화</h2>
       <p className="text-sm text-gray-500 mb-4">
-        유튜브 채널과 네이버 블로그에서 최신 콘텐츠를 자동으로 가져옵니다.
+        유튜브 채널과 네이버 블로그에서 최신 콘텐츠를 가져옵니다. 매일 자동 실행되며, 수동으로도 실행 가능합니다.
       </p>
       <div className="flex flex-wrap gap-3">
         <SyncButton
