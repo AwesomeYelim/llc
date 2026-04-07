@@ -99,9 +99,11 @@ export default async function ColumnsPage() {
           </h2>
           <div className="space-y-6">
             {sermons.map((sermon) => (
-              <Link
+              <a
                 key={sermon.id}
-                href={`/blog/${sermon.id}`}
+                href={sermon.blogUrl || `/blog/${sermon.id}`}
+                target={sermon.blogUrl ? "_blank" : undefined}
+                rel={sermon.blogUrl ? "noopener noreferrer" : undefined}
                 className="block bg-white rounded-xl border border-[#c4c6cf]/20 p-6 lg:p-8 hover:shadow-md hover:border-[#795900]/20 transition-all group"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -131,10 +133,10 @@ export default async function ColumnsPage() {
                     </div>
                   </div>
                   <span className="material-symbols-outlined text-[#c4c6cf] group-hover:text-[#795900] transition-colors shrink-0">
-                    arrow_forward
+                    {sermon.blogUrl ? "open_in_new" : "arrow_forward"}
                   </span>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </section>

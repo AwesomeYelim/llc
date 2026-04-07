@@ -20,7 +20,7 @@ export default async function SermonsPage({
   const page = parseInt(pageStr || "1")
   const limit = 12
 
-  const where: Record<string, unknown> = {}
+  const where: Record<string, unknown> = { youtubeId: { not: null } }
   if (serviceType) where.serviceType = serviceType
 
   const [sermons, total] = await Promise.all([
