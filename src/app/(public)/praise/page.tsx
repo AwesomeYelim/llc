@@ -1,8 +1,7 @@
 import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
-import { formatDate } from "@/lib/utils"
-import { DownloadButton } from "@/components/DownloadButton"
+import { PraiseGrid } from "@/components/praise/PraiseGrid"
 
 export const metadata: Metadata = generatePageMetadata(
   "찬양 콘티 & 가사 PPT",
@@ -16,6 +15,20 @@ export default async function PraisePage() {
   })
 
   const totalDownloads = contis.reduce((sum, c) => sum + c.downloadCount, 0)
+
+  // Serialize for client component
+  const serialized = contis.map((c) => ({
+    id: c.id,
+    title: c.title,
+    serviceDate: c.serviceDate.toISOString(),
+    fileName: c.fileName,
+    fileUrl: c.fileUrl,
+    fileSize: c.fileSize,
+    downloadCount: c.downloadCount,
+    musicalKey: c.musicalKey,
+    theme: c.theme,
+    season: c.season,
+  }))
 
   return (
     <div>
@@ -34,6 +47,7 @@ export default async function PraisePage() {
             </h1>
             <p className="text-lg text-[#43474e] leading-relaxed max-w-xl">
               매주 예배에서 사용된 찬양 콘티와 가사 PPT를 확인하고 자유롭게 다운로드하세요.
+              코드별, 메세지별, 절기별로 찾아보세요.
             </p>
           </div>
           <div className="flex items-center gap-4 pb-2">
@@ -62,66 +76,9 @@ export default async function PraisePage() {
         </div>
       </section>
 
-      {/* Table Layout */}
+      {/* Filterable Grid */}
       <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
-        <div className="bg-[#f5f3f0] rounded-xl p-2">
-          {contis.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full border-separate border-spacing-y-3">
-                <thead>
-                  <tr className="text-left">
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">
-                      날짜
-                    </th>
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">
-                      제목
-                    </th>
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold hidden md:table-cell">
-                      다운로드 수
-                    </th>
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold text-right">
-                      다운로드
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contis.map((conti) => (
-                    <tr key={conti.id} className="group hover:bg-white/50 transition-all duration-300">
-                      <td className="px-6 lg:px-8 py-8 bg-white first:rounded-l-xl">
-                        <div className="font-serif text-xl lg:text-2xl font-bold text-[#022448]">
-                          {formatDate(conti.serviceDate).replace(/\d{4}년\s*/, "")}
-                        </div>
-                        <div className="text-xs text-[#43474e] mt-1">{formatDate(conti.serviceDate).match(/\d{4}년/)?.[0]}</div>
-                      </td>
-                      <td className="px-6 lg:px-8 py-8 bg-white">
-                        <h3 className="font-serif text-lg font-semibold text-[#022448] mb-1">
-                          {conti.title}
-                        </h3>
-                        <p className="text-sm text-[#43474e]">{conti.fileName}</p>
-                      </td>
-                      <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
-                        <span className="text-[#43474e] text-sm">{conti.downloadCount}회</span>
-                      </td>
-                      <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl text-right">
-                        <DownloadButton
-                          fileUrl={conti.fileUrl}
-                          fileName={conti.fileName}
-                          id={conti.id}
-                          endpoint="/api/praise"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-24">
-              <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4">music_off</span>
-              <p className="text-[#43474e]">등록된 콘티가 없습니다.</p>
-            </div>
-          )}
-        </div>
+        <PraiseGrid contis={serialized} />
       </section>
     </div>
   )

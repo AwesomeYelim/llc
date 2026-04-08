@@ -8,6 +8,10 @@
     {
       "path": "/api/sync/blog",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/sync/drive",
+      "schedule": "0 6 * * *"
     }
   ]
 }

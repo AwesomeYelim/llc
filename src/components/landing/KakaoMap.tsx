@@ -89,7 +89,7 @@ export function KakaoMap({ address }: { address: string }) {
             <iframe
               src={naverMapUrl}
               style={{ border: 0, position: "absolute", top: 0, left: "-500px", width: "calc(100% + 500px)", height: "100%" }}
-              allowFullScreen
+              sandbox="allow-scripts allow-same-origin"
               loading="lazy"
               title="교회 위치 - 네이버 지도"
             />

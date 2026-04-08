@@ -92,8 +92,14 @@ model PraiseConti {
   fileUrl       String
   fileSize      Int
   downloadCount Int      @default(0)
+  musicalKey    String?  // 코드: A, B, C, D, E, F, G 등
+  theme         String?  // 메세지/주제: 은혜, 성령, 부흥, 왕 등
+  season        String?  // 절기: 성탄, 부활, 추수감사, 사순절 등
   createdAt     DateTime @default(now())
 
+  @@index([musicalKey])
+  @@index([theme])
+  @@index([season])
   @@map("praise_contis")
 }
 
