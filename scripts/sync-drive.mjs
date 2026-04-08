@@ -64,8 +64,24 @@ function parseFilename(name) {
   return { musicalKey, theme, season };
 }
 
+let convertCount = 0;
+
+function restartKeynote() {
+  try { execSync('pkill -f Keynote', { timeout: 5000 }); } catch {}
+  execSync('sleep 3');
+  execSync('open -a Keynote');
+  execSync('sleep 5');
+  console.log('  [Keynote restarted]');
+}
+
 // Convert .key to PDF using Keynote via AppleScript
 function convertKeyToPdf(keyFilePath, pdfFilePath) {
+  // Restart Keynote every 15 files to prevent memory crashes
+  if (convertCount > 0 && convertCount % 15 === 0) {
+    restartKeynote();
+  }
+  convertCount++;
+
   const scriptContent = `
 tell application "Keynote"
   set theDoc to open POSIX file "${keyFilePath}"
@@ -81,9 +97,19 @@ end tell
     unlinkSync(scriptPath);
     return true;
   } catch (e) {
-    console.error(`  Failed to convert: ${e.message}`);
-    try { unlinkSync(scriptPath); } catch {}
-    return false;
+    // If Keynote crashed, restart and retry once
+    console.log('  Keynote may have crashed, restarting...');
+    restartKeynote();
+    writeFileSync(scriptPath, scriptContent);
+    try {
+      execSync(`osascript "${scriptPath}"`, { timeout: 60000 });
+      unlinkSync(scriptPath);
+      return true;
+    } catch (e2) {
+      console.error(`  Failed to convert: ${e2.message}`);
+      try { unlinkSync(scriptPath); } catch {}
+      return false;
+    }
   }
 }
 
@@ -93,14 +119,19 @@ async function main() {
   const drive = getDriveClient();
 
   console.log('Listing files in Google Drive folder...');
-  const res = await drive.files.list({
-    q: `'${FOLDER_ID}' in parents and trashed = false`,
-    fields: 'files(id, name, size, mimeType, createdTime)',
-    orderBy: 'createdTime desc',
-    pageSize: 100,
-  });
-
-  const files = res.data.files || [];
+  let files = [];
+  let pageToken = null;
+  do {
+    const res = await drive.files.list({
+      q: `'${FOLDER_ID}' in parents and trashed = false`,
+      fields: 'nextPageToken, files(id, name, size, mimeType, createdTime)',
+      orderBy: 'createdTime desc',
+      pageSize: 100,
+      pageToken: pageToken || undefined,
+    });
+    files.push(...(res.data.files || []));
+    pageToken = res.data.nextPageToken;
+  } while (pageToken);
   console.log(`Found ${files.length} files\n`);
 
   // Get existing records
@@ -154,6 +185,8 @@ async function main() {
       const blob = await put(`praise/${uploadName}`, uploadBuffer, {
         access: 'public',
         contentType,
+        addRandomSuffix: false,
+        allowOverwrite: true,
       });
 
       // Parse category info from filename

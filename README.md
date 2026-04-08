@@ -59,6 +59,13 @@ NEXTAUTH_URL="http://localhost:3000"
 
 # Vercel Blob (파일 업로드)
 BLOB_READ_WRITE_TOKEN="vercel_blob_rw_xxxxxxxxxxxx"
+
+# Google Drive 동기화 (찬양 콘티)
+GOOGLE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'
+GOOGLE_DRIVE_FOLDER_ID="your-google-drive-folder-id"
+
+# Vercel Cron 인증
+CRON_SECRET="your-cron-secret"
 ```
 
 | 변수 | 설명 |
@@ -67,6 +74,9 @@ BLOB_READ_WRITE_TOKEN="vercel_blob_rw_xxxxxxxxxxxx"
 | `NEXTAUTH_SECRET` | Auth.js 세션 암호화에 사용되는 비밀 키. `openssl rand -base64 32`로 생성 가능 |
 | `NEXTAUTH_URL` | 사이트 기본 URL. 로컬 개발 시 `http://localhost:3000` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob 읽기/쓰기 토큰. Vercel 대시보드에서 발급 |
+| `GOOGLE_SERVICE_ACCOUNT_KEY` | Google Drive 서비스 계정 JSON 키 (찬양 콘티 동기화용) |
+| `GOOGLE_DRIVE_FOLDER_ID` | 찬양 콘티가 저장된 Google Drive 폴더 ID |
+| `CRON_SECRET` | Vercel Cron 인증 토큰 |
 
 ### 3. 의존성 설치
 
@@ -144,6 +154,7 @@ llc/
 │   │   │   ├── auth/          #   NextAuth 인증
 │   │   │   ├── sermons/       #   설교 API
 │   │   │   ├── praise/        #   찬양 콘티 & 가사 PPT API
+│   │   │   ├── sync/          #   자동 동기화 (YouTube, 블로그, Google Drive)
 │   │   │   ├── bulletins/     #   주보 API
 │   │   │   ├── columns/       #   칼럼 API
 │   │   │   ├── gallery/       #   갤러리 API
@@ -205,7 +216,7 @@ llc/
 | `Admin` | 관리자 계정 (이메일, 해시된 비밀번호) |
 | `Sermon` | 설교 (제목, 성경 구절, 날짜, 예배 유형, 유튜브 URL, 시리즈, 태그) |
 | `Column` | 설교 원고/칼럼 (제목, 본문 HTML, 연결 설교, 커버 이미지, 조회수) |
-| `PraiseConti` | 찬양 콘티 & 가사 PPT 파일 (제목, 날짜, 파일 URL, 다운로드 수) |
+| `PraiseConti` | 찬양 콘티 & 가사 PPT 파일 (제목, 날짜, 파일 URL, 다운로드 수, 코드, 메세지, 절기) |
 | `Bulletin` | 주보/PPT (제목, 날짜, 유형) |
 | `BulletinFile` | 주보 첨부 파일 (파일 URL, 다운로드 수) |
 | `GalleryImage` | 갤러리 이미지 (URL, 제목, 카테고리, 정렬 순서) |
@@ -246,10 +257,10 @@ llc/
 - **랜딩 페이지** -- 히어로 배너, 비전 메시지, 예배 시간, 최근 설교, 카카오맵, 빠른 링크
 - **설교 관리** -- 설교 등록/수정/삭제, 유튜브 영상 연동, 시리즈 및 태그 분류
 - **설교 원고(칼럼)** -- 매거진 스타일 칼럼 상세 페이지, 검색/정렬(최신순·오래된순·조회순·제목순), 조회수 추적
-- **찬양 콘티 & 가사 PPT** -- PDF/HWP/DOCX/PPTX 파일 업로드 및 다운로드
+- **찬양 콘티 & 가사 PPT** -- Google Drive 자동 동기화, .key→PDF 변환, 코드별/메세지별/절기별 필터, 검색, 다운로드
 - **주보 & 예배 PPT** -- 주보 및 예배 PPT 파일 업로드 및 다운로드
 - **갤러리** -- 교회 사진 업로드 및 카테고리별 관리
-- **자동 동기화** -- YouTube 채널 설교 영상 및 네이버 블로그 설교 칼럼 자동 수집 (Vercel Cron, 매일 오전 6시)
+- **자동 동기화** -- YouTube, 네이버 블로그, Google Drive 자동 수집 (Vercel Cron, 매일 오전 6시)
 - **사이트 설정** -- 교회 정보, 예배 시간, 유튜브/블로그 URL 등 동적 설정
 - **SEO** -- 사이트맵, robots.txt, JSON-LD 구조화 데이터, Open Graph 메타태그
 - **성능 최적화** -- SSG/ISR(5분 캐시), DB 인덱스, unstable_cache, 서울 리전(icn1), 로딩 스켈레톤

@@ -75,14 +75,19 @@ async function syncDrive() {
 
     const drive = getDriveClient()
 
-    const res = await drive.files.list({
-      q: `'${folderId}' in parents and trashed = false`,
-      fields: "files(id, name, size, mimeType, createdTime)",
-      orderBy: "createdTime desc",
-      pageSize: 50,
-    })
-
-    const files = res.data.files || []
+    const files: { id?: string | null; name?: string | null; size?: string | null; mimeType?: string | null; createdTime?: string | null }[] = []
+    let pageToken: string | undefined
+    do {
+      const res = await drive.files.list({
+        q: `'${folderId}' in parents and trashed = false`,
+        fields: "nextPageToken, files(id, name, size, mimeType, createdTime)",
+        orderBy: "createdTime desc",
+        pageSize: 100,
+        pageToken,
+      })
+      files.push(...(res.data.files || []))
+      pageToken = res.data.nextPageToken || undefined
+    } while (pageToken)
 
     const existing = await prisma.praiseConti.findMany({
       select: { fileName: true },
