@@ -19,24 +19,32 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const isDownload = request.nextUrl.searchParams.get("download") === "1"
+  const mode = request.nextUrl.searchParams.get("download") === "1" ? "download"
+    : request.nextUrl.searchParams.get("view") === "1" ? "view"
+    : null
 
-  // Increment download count
-  const conti = await prisma.praiseConti.update({
-    where: { id: parseInt(id) },
-    data: { downloadCount: { increment: 1 } },
-  })
+  // Increment download count only for actual downloads
+  const conti = mode === "download"
+    ? await prisma.praiseConti.update({
+        where: { id: parseInt(id) },
+        data: { downloadCount: { increment: 1 } },
+      })
+    : await prisma.praiseConti.findUniqueOrThrow({ where: { id: parseInt(id) } })
 
-  if (isDownload) {
+  if (mode) {
     const fileRes = await fetch(conti.fileUrl)
     if (!fileRes.ok) {
       return NextResponse.json({ error: "File not found" }, { status: 404 })
     }
 
+    const disposition = mode === "download"
+      ? `attachment; filename*=UTF-8''${encodeURIComponent(conti.fileName)}`
+      : `inline; filename*=UTF-8''${encodeURIComponent(conti.fileName)}`
+
     return new NextResponse(fileRes.body, {
       headers: {
-        "Content-Type": fileRes.headers.get("Content-Type") || "application/octet-stream",
-        "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(conti.fileName)}`,
+        "Content-Type": fileRes.headers.get("Content-Type") || "application/pdf",
+        "Content-Disposition": disposition,
       },
     })
   }

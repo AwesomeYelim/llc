@@ -44,8 +44,7 @@ export default async function BulletinPage() {
                   <tr className="text-left">
                     <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">날짜</th>
                     <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold">제목</th>
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold hidden md:table-cell">유형</th>
-                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold text-right">파일</th>
+                    <th className="px-6 lg:px-8 pb-4 text-xs uppercase tracking-widest text-[#74777f] font-semibold text-right">다운로드</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -59,15 +58,6 @@ export default async function BulletinPage() {
                       <td className="px-6 lg:px-8 py-8 bg-white">
                         <h3 className="font-serif text-lg font-semibold text-[#022448]">{bulletin.title}</h3>
                       </td>
-                      <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          bulletin.bulletinType === "PPT"
-                            ? "bg-[#ffdfa0] text-[#795900]"
-                            : "bg-[#d5e3ff] text-[#022448]"
-                        }`}>
-                          {bulletin.bulletinType === "PPT" ? "PPT" : "주보"}
-                        </span>
-                      </td>
                       <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl">
                         <div className="flex justify-end gap-2 flex-wrap">
                           {bulletin.files.map((file) => (
@@ -78,7 +68,7 @@ export default async function BulletinPage() {
                               className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
                             >
                               <span className="material-symbols-outlined text-sm">download</span>
-                              {file.fileName.split(".").pop()?.toUpperCase()}
+                              {file.fileName.endsWith(".zip") ? "주보+PPT" : file.fileName.split(".").pop()?.toUpperCase()}
                               <span className="text-white/60 text-xs">({formatFileSize(file.fileSize)})</span>
                             </a>
                           ))}

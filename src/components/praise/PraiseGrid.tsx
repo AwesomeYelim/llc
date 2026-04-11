@@ -233,12 +233,22 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                       <span className="text-[#43474e] text-sm">{conti.downloadCount}회</span>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl text-right">
-                      <DownloadButton
-                        fileUrl={conti.fileUrl}
-                        fileName={conti.fileName}
-                        id={conti.id}
-                        endpoint="/api/praise"
-                      />
+                      <div className="flex justify-end gap-2">
+                        <a
+                          href={`/api/praise/${conti.id}?view=1`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 px-4 py-2 border border-[#1e3a5f] text-[#1e3a5f] rounded-lg text-sm hover:bg-[#1e3a5f]/5 transition-colors"
+                        >
+                          보기
+                        </a>
+                        <DownloadButton
+                          fileUrl={conti.fileUrl}
+                          fileName={conti.fileName}
+                          id={conti.id}
+                          endpoint="/api/praise"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

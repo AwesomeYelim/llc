@@ -67,7 +67,7 @@ export default async function PraisePage() {
       <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-24 flex justify-center">
         <div className="text-center max-w-3xl">
           <div className="w-[2px] h-12 bg-[#795900] mx-auto mb-6" />
-          <blockquote className="font-serif text-xl md:text-2xl italic text-[#022448] leading-relaxed">
+          <blockquote className="font-serif text-xl md:text-2xl italic text-[#022448] leading-relaxed text-balance">
             &ldquo;시와 찬송과 신령한 노래를 부르며 너희의 마음으로 주께 노래하며 찬송하라&rdquo;
           </blockquote>
           <cite className="block mt-4 text-[#795900] text-sm font-semibold tracking-widest uppercase not-italic">
