@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { notifyIndexNow } from "@/lib/indexnow"
 
 export async function GET(
   _request: NextRequest,
@@ -42,6 +43,7 @@ export async function PUT(
     },
   })
 
+  notifyIndexNow([`/sermons/${id}`])
   return NextResponse.json(sermon)
 }
 

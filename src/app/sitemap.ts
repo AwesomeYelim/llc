@@ -9,13 +9,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
 
   const staticPages = [
-    { url: SITE_URL, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1 },
-    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${SITE_URL}/sermons`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
-    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
-    { url: `${SITE_URL}/praise`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
-    { url: `${SITE_URL}/bulletin`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
-    { url: `${SITE_URL}/columns`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: SITE_URL, changeFrequency: "weekly" as const, priority: 1 },
+    { url: `${SITE_URL}/about`, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${SITE_URL}/sermons`, changeFrequency: "weekly" as const, priority: 0.9 },
+    { url: `${SITE_URL}/blog`, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${SITE_URL}/praise`, changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${SITE_URL}/bulletin`, changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${SITE_URL}/columns`, changeFrequency: "weekly" as const, priority: 0.8 },
   ]
 
   const sermonPages = sermons.map((s) => ({

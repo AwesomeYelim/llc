@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { notifyIndexNow } from "@/lib/indexnow"
 
 const BLOG_ID = "hey0190"
 const RSS_URL = `https://rss.blog.naver.com/${BLOG_ID}`
@@ -113,6 +114,7 @@ async function syncBlog() {
 
   let synced = 0
   let skipped = 0
+  const newPaths: string[] = []
 
   for (const post of sermonPosts) {
     const blogUrl = cleanBlogUrl(post.link)
@@ -173,7 +175,7 @@ async function syncBlog() {
     }
 
     // Column 생성
-    await prisma.column.create({
+    const column = await prisma.column.create({
       data: {
         title: cleanTitle,
         content,
@@ -182,8 +184,11 @@ async function syncBlog() {
       },
     })
 
+    newPaths.push(`/sermons/${sermon.id}`, `/columns/${column.id}`)
     synced++
   }
+
+  if (newPaths.length > 0) notifyIndexNow(newPaths)
 
   return { success: true, synced, skipped, total: sermonPosts.length }
 }

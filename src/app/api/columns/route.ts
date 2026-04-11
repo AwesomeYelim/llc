@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { notifyIndexNow } from "@/lib/indexnow"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -35,5 +36,6 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  notifyIndexNow([`/columns/${column.id}`])
   return NextResponse.json(column, { status: 201 })
 }

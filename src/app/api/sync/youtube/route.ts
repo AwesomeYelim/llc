@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { notifyIndexNow } from "@/lib/indexnow"
 
 const CHANNEL_ID = "UC-ycCN7v6gzWxuOvM6BWJAg"
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`
@@ -39,6 +40,7 @@ async function syncYoutube() {
 
   let synced = 0
   let skipped = 0
+  const newPaths: string[] = []
 
   for (const video of videos) {
     const existing = await prisma.sermon.findFirst({
@@ -52,7 +54,7 @@ async function syncYoutube() {
 
     const scriptureMatch = video.title.match(/([가-힣]+\s*\d+[:\s]*\d+[-~]?\d*)/)
 
-    await prisma.sermon.create({
+    const sermon = await prisma.sermon.create({
       data: {
         title: video.title.trim(),
         scripture: scriptureMatch?.[1] ?? "",
@@ -62,8 +64,11 @@ async function syncYoutube() {
         youtubeId: video.videoId,
       },
     })
+    newPaths.push(`/sermons/${sermon.id}`)
     synced++
   }
+
+  if (newPaths.length > 0) notifyIndexNow(newPaths)
 
   return { success: true, synced, skipped, total: videos.length }
 }

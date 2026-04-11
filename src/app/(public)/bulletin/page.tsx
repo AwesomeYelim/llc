@@ -73,7 +73,7 @@ export default async function BulletinPage() {
                           {bulletin.files.map((file) => (
                             <a
                               key={file.id}
-                              href={file.fileUrl}
+                              href={`/api/bulletins/${file.id}/download?download=1`}
                               download={file.fileName}
                               className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
                             >

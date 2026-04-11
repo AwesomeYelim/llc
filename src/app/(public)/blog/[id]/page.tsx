@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { formatDate } from "@/lib/utils"
 import Link from "next/link"
+import { generatePageMetadata, sermonJsonLd } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -12,10 +14,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const sermon = await prisma.sermon.findUnique({ where: { id: parseInt(id) } })
   if (!sermon) return { title: "글을 찾을 수 없습니다" }
-  return {
-    title: sermon.title,
-    description: sermon.summary || sermon.title,
-  }
+
+  return generatePageMetadata(
+    sermon.title,
+    sermon.summary || sermon.title,
+    `/blog/${id}`
+  )
 }
 
 export default async function BlogDetailPage({ params }: Props) {
@@ -28,9 +32,16 @@ export default async function BlogDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <Link href="/blog" className="text-sm text-[#1e3a5f] hover:underline mb-6 inline-block">
-        ← 블로그 목록
-      </Link>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(sermonJsonLd(sermon)) }}
+      />
+      <Breadcrumbs
+        items={[
+          { name: "블로그", path: "/blog" },
+          { name: sermon.title, path: `/blog/${sermon.id}` },
+        ]}
+      />
 
       <article>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{sermon.title}</h1>

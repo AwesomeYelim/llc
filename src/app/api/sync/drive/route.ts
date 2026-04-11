@@ -3,6 +3,7 @@ import { google } from "googleapis"
 import { put } from "@vercel/blob"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { notifyIndexNow } from "@/lib/indexnow"
 
 const SEASON_KEYWORDS: Record<string, string> = {
   "성탄": "성탄절", "크리스마스": "성탄절",
@@ -146,6 +147,8 @@ async function syncDrive() {
 
       synced++
     }
+
+    if (synced > 0) notifyIndexNow(["/praise"])
 
     return NextResponse.json({
       success: true,

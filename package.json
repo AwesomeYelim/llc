@@ -10,7 +10,10 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:migrate": "prisma migrate deploy"
+    "db:migrate": "prisma migrate deploy",
+    "sync:local": "node scripts/sync-local.mjs",
+    "sync:conti": "node scripts/sync-local.mjs --conti",
+    "sync:bulletin": "node scripts/sync-local.mjs --bulletin"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

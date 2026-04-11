@@ -7,6 +7,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { ShareButtons } from "@/components/ShareButtons"
 import { ViewTracker } from "@/components/columns/ViewTracker"
+import { generatePageMetadata, columnJsonLd } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -53,10 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const column = await getColumn(parseInt(id))
   if (!column) return { title: "칼럼을 찾을 수 없습니다" }
-  return {
-    title: column.title,
-    description: column.content.replace(/<[^>]*>/g, "").slice(0, 160),
-  }
+
+  return generatePageMetadata(
+    column.title,
+    column.content.replace(/<[^>]*>/g, "").slice(0, 160),
+    `/columns/${id}`,
+    { ogImage: column.coverImageUrl || undefined }
+  )
 }
 
 /** 본문에서 첫 번째 의미 있는 문장 추출 (pull quote용) */
@@ -88,7 +93,19 @@ export default async function ColumnDetailPage({ params }: Props) {
 
   return (
     <div className="bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(columnJsonLd(column)) }}
+      />
       <ViewTracker id={column.id} />
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-12 pt-4">
+        <Breadcrumbs
+          items={[
+            { name: "칼럼", path: "/columns" },
+            { name: column.title, path: `/columns/${column.id}` },
+          ]}
+        />
+      </div>
       {/* Hero Section - Magazine Style */}
       <header className="relative">
         {/* Hero Image */}

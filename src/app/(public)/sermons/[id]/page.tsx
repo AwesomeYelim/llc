@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { formatDate, serviceTypeLabel } from "@/lib/utils"
 import Link from "next/link"
+import { generatePageMetadata, sermonJsonLd } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -13,10 +15,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sermon = await prisma.sermon.findUnique({ where: { id: parseInt(id) } })
   if (!sermon) return { title: "설교를 찾을 수 없습니다" }
 
-  return {
-    title: sermon.title,
-    description: sermon.summary || `${sermon.title} - ${sermon.scripture}`,
-  }
+  const ogImage = sermon.youtubeId
+    ? `https://img.youtube.com/vi/${sermon.youtubeId}/maxresdefault.jpg`
+    : undefined
+
+  return generatePageMetadata(
+    sermon.title,
+    sermon.summary || `${sermon.title} - ${sermon.scripture}`,
+    `/sermons/${id}`,
+    { ogImage }
+  )
 }
 
 export default async function SermonDetailPage({ params }: Props) {
@@ -30,14 +38,16 @@ export default async function SermonDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
-      {/* Back link */}
-      <Link
-        href="/sermons"
-        className="inline-flex items-center gap-2 text-[#022448] hover:text-[#795900] transition-colors mb-8"
-      >
-        <span className="material-symbols-outlined text-sm">arrow_back</span>
-        설교 목록
-      </Link>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(sermonJsonLd(sermon)) }}
+      />
+      <Breadcrumbs
+        items={[
+          { name: "설교", path: "/sermons" },
+          { name: sermon.title, path: `/sermons/${sermon.id}` },
+        ]}
+      />
 
       {/* Header */}
       <div className="mb-8">

@@ -8,13 +8,9 @@ interface DownloadButtonProps {
 }
 
 export function DownloadButton({ fileUrl, fileName, id, endpoint }: DownloadButtonProps) {
-  const handleDownload = async () => {
-    // Track download
-    fetch(`${endpoint}/${id}`, { method: "GET" }).catch(() => {})
-
-    // Trigger download
+  const handleDownload = () => {
     const a = document.createElement("a")
-    a.href = fileUrl
+    a.href = `${endpoint}/${id}?download=1`
     a.download = fileName
     a.click()
   }
