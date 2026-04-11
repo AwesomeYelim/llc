@@ -40,13 +40,16 @@ export default async function SermonsPage({
       {/* Hero Header */}
       <header className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-16">
         <div className="max-w-3xl">
-          <span className="text-[#795900] font-semibold tracking-widest text-xs uppercase mb-4 block">
-            아카이브
-          </span>
-          <h1 className="text-4xl md:text-6xl font-bold font-serif text-[#022448] leading-tight mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-12 h-[1px] bg-[#795900]" />
+            <span className="text-sm uppercase tracking-[0.2em] text-[#795900] font-semibold">
+              아카이브
+            </span>
+          </div>
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight text-balance">
             설교 라이브러리
           </h1>
-          <p className="text-[#43474e] text-lg lg:text-xl leading-relaxed">
+          <p className="text-lg text-[#43474e] leading-relaxed">
             하나님의 말씀을 통해 은혜를 나눕니다. 영적 성장과 성경적 진리를 위한 메시지들을 만나보세요.
           </p>
         </div>

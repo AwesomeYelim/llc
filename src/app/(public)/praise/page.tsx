@@ -33,24 +33,22 @@ export default async function PraisePage() {
   return (
     <div>
       {/* Hero Header */}
-      <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-16">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-12 h-[1px] bg-[#795900]" />
-              <span className="text-sm uppercase tracking-[0.2em] text-[#795900] font-semibold">
-                예배 리소스
-              </span>
-            </div>
-            <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight">
-              찬양 콘티 & 가사 PPT
-            </h1>
-            <p className="text-lg text-[#43474e] leading-relaxed max-w-xl">
-              매주 예배에서 사용된 찬양 콘티와 가사 PPT를 확인하고 자유롭게 다운로드하세요.
-              코드별, 메세지별, 절기별로 찾아보세요.
-            </p>
+      <header className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-16">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-12 h-[1px] bg-[#795900]" />
+            <span className="text-sm uppercase tracking-[0.2em] text-[#795900] font-semibold">
+              예배 리소스
+            </span>
           </div>
-          <div className="flex items-center gap-4 pb-2">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight text-balance">
+            찬양 콘티 & 가사 PPT
+          </h1>
+          <p className="text-lg text-[#43474e] leading-relaxed mb-6">
+            매주 예배에서 사용된 찬양 콘티와 가사 PPT를 확인하고 자유롭게 다운로드하세요.
+            코드별, 메세지별, 절기별로 찾아보세요.
+          </p>
+          <div className="flex items-center gap-4">
             <div className="p-4 bg-[#f5f3f0] rounded-xl">
               <span className="text-xs text-[#43474e] block mb-1">총 리소스</span>
               <span className="font-serif text-2xl font-bold text-[#022448]">{contis.length}개</span>
@@ -61,7 +59,7 @@ export default async function PraisePage() {
             </div>
           </div>
         </div>
-      </section>
+      </header>
 
       {/* Spiritual Quote */}
       <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-24 flex justify-center">

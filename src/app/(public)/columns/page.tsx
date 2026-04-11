@@ -40,14 +40,15 @@ export default async function ColumnsPage() {
       <header className="max-w-screen-2xl mx-auto px-6 lg:px-12 mb-16">
         <div className="max-w-3xl">
           <div className="flex items-center gap-3 mb-4">
-            <span className="bg-[#ffdfa0] text-[#795900] px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+            <span className="w-12 h-[1px] bg-[#795900]" />
+            <span className="text-sm uppercase tracking-[0.2em] text-[#795900] font-semibold">
               말씀 칼럼
             </span>
           </div>
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-[#022448] leading-tight mb-6">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] mb-6 leading-tight text-balance">
             설교 칼럼
           </h1>
-          <p className="font-serif text-lg md:text-xl text-[#43474e] leading-relaxed italic max-w-2xl">
+          <p className="text-lg text-[#43474e] leading-relaxed">
             말씀의 깊이를 칼럼으로 만나보세요. 은혜의 말씀이 삶으로 이어지는 여정입니다.
           </p>
         </div>
