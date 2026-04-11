@@ -3,7 +3,7 @@ import { Metadata } from "next"
 export const SITE_NAME = "동남 생명의 빛 교회"
 export const SITE_DESCRIPTION =
   "청주시 상당구 가족 공동체, 동남 생명의 빛 교회. 이름을 불러주는 따뜻한 교회입니다."
-export const SITE_URL = "https://dongnam.church"
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://llc-beta.vercel.app"
 export const SITE_KEYWORDS = [
   "청주 상당구 교회",
   "청주 소규모 교회",
