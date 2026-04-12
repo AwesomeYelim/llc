@@ -34,6 +34,10 @@ export default function AdminGalleryPage() {
       const formData = new FormData()
       formData.append("file", file)
       const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
+      if (!uploadRes.ok) {
+        const err = await uploadRes.json().catch(() => ({}))
+        throw new Error(err.error || `업로드 API 오류 (${uploadRes.status})`)
+      }
       const uploadData = await uploadRes.json()
 
       const res = await fetch("/api/gallery", {
@@ -45,13 +49,17 @@ export default function AdminGalleryPage() {
           category: category || null,
         }),
       })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `갤러리 저장 오류 (${res.status})`)
+      }
       const newImage = await res.json()
       setImages((prev) => [...prev, newImage])
       setTitle("")
       setCategory("")
       setFile(null)
-    } catch {
-      alert("업로드 실패")
+    } catch (e) {
+      alert(`업로드 실패: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
       setLoading(false)
     }

@@ -48,8 +48,10 @@ async function search(q: string): Promise<SearchResult> {
       where: {
         OR: [
           { title: { contains: q, mode: "insensitive" } },
+          { fileName: { contains: q, mode: "insensitive" } },
           { theme: { contains: q, mode: "insensitive" } },
           { season: { contains: q, mode: "insensitive" } },
+          { musicalKey: { contains: q, mode: "insensitive" } },
         ],
       },
       orderBy: { serviceDate: "desc" },

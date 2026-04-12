@@ -37,15 +37,3 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(prayer, { status: 201 })
 }
 
-export async function PATCH(req: NextRequest) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-  const { id, isAnswered } = await req.json()
-  const updated = await prisma.prayerRequest.update({
-    where: { id: Number(id) },
-    data: { isAnswered },
-  })
-
-  return NextResponse.json(updated)
-}

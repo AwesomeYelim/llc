@@ -2,8 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
+import { FileUpload } from "@/components/ui/FileUpload"
 import { RichTextEditor } from "./RichTextEditor"
 
 interface ColumnFormProps {
@@ -26,6 +28,23 @@ export function ColumnForm({ initial, sermons }: ColumnFormProps) {
   const [scripture, setScripture] = useState(initial?.scripture || "")
   const [sermonId, setSermonId] = useState(initial?.sermonId || "")
   const [coverImageUrl, setCoverImageUrl] = useState(initial?.coverImageUrl || "")
+  const [imageUploading, setImageUploading] = useState(false)
+
+  const handleImageUpload = async (file: File) => {
+    setImageUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: formData })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setCoverImageUrl(data.url)
+    } catch {
+      alert("이미지 업로드에 실패했습니다.")
+    } finally {
+      setImageUploading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,12 +107,22 @@ export function ColumnForm({ initial, sermons }: ColumnFormProps) {
             ))}
           </select>
         </div>
-        <Input
-          id="coverImageUrl"
-          label="커버 이미지 URL"
-          value={coverImageUrl}
-          onChange={(e) => setCoverImageUrl(e.target.value)}
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">커버 이미지</label>
+          <FileUpload
+            label="이미지 업로드"
+            accept="image/*"
+            onFileSelect={handleImageUpload}
+          />
+          {imageUploading && (
+            <p className="text-xs text-gray-500 mt-1">업로드 중...</p>
+          )}
+          {coverImageUrl && !imageUploading && (
+            <div className="mt-2 relative w-full aspect-video rounded-lg overflow-hidden border border-gray-200">
+              <Image src={coverImageUrl} alt="커버 이미지 미리보기" fill className="object-cover" />
+            </div>
+          )}
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">본문</label>

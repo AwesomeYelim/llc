@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
-import prisma from "@/lib/prisma"
 import { PrayerForm } from "@/components/prayer/PrayerForm"
 
 export const metadata: Metadata = generatePageMetadata(
@@ -10,12 +9,6 @@ export const metadata: Metadata = generatePageMetadata(
 )
 
 export default async function PrayerPage() {
-  const answered = await prisma.prayerRequest.findMany({
-    where: { isAnonymous: false, isAnswered: true },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-  })
-
   return (
     <div className="max-w-screen-xl mx-auto px-6 lg:px-12 py-24">
       {/* Header */}
@@ -34,42 +27,8 @@ export default async function PrayerPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Submit form */}
+      <div className="max-w-2xl">
         <PrayerForm />
-
-        {/* Answered prayers */}
-        <div>
-          <h2 className="font-serif text-xl text-[#022448] mb-6 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#795900]">check_circle</span>
-            응답된 기도
-          </h2>
-          {answered.length > 0 ? (
-            <div className="space-y-4">
-              {answered.map((p) => (
-                <div key={p.id} className="bg-[#f5f3f0] rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-[#795900] bg-[#ffdfa0]/30 px-2 py-0.5 rounded-full">
-                      응답됨
-                    </span>
-                    <span className="text-xs text-[#74777f]">{p.name}</span>
-                  </div>
-                  <p className="text-[#43474e] text-sm leading-relaxed">{p.content}</p>
-                  <p className="text-xs text-[#74777f] mt-2">
-                    {new Date(p.createdAt).toLocaleDateString("ko-KR")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-[#43474e] bg-[#f5f3f0] rounded-xl">
-              <span className="material-symbols-outlined text-[#c4c6cf] text-5xl mb-3 block">
-                favorite
-              </span>
-              기도 응답 사례가 쌓이고 있습니다.
-            </div>
-          )}
-        </div>
       </div>
     </div>
   )
