@@ -90,7 +90,7 @@ export default async function AboutPage() {
       <section className="py-24 bg-[#f5f3f0]">
         <div className="max-w-3xl mx-auto text-center px-6">
           <div className="w-px h-16 bg-[#795900] mx-auto mb-8" />
-          <blockquote className="text-2xl md:text-3xl font-serif italic text-[#022448] leading-relaxed">
+          <blockquote className="text-2xl md:text-3xl font-serif italic text-[#022448] leading-relaxed break-keep">
             &ldquo;{settings.vision || "하나님의 일을 성공시켜라"}&rdquo;
           </blockquote>
           <p className="mt-6 text-[#795900] uppercase tracking-widest text-sm font-semibold">

@@ -196,7 +196,7 @@ export default async function ColumnDetailPage({ params }: Props) {
           {/* Pull Quote */}
           {pullQuote && (
             <blockquote className="my-16 py-12 border-y-2 border-[#795900]/20 text-center px-4">
-              <p className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-[#022448] leading-snug max-w-2xl mx-auto">
+              <p className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold text-[#022448] leading-snug max-w-2xl mx-auto break-keep">
                 &ldquo;{pullQuote}&rdquo;
               </p>
               <cite className="block mt-6 text-sm text-[#795900] font-bold not-italic tracking-widest uppercase">

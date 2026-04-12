@@ -134,7 +134,13 @@ async function syncDrive() {
 
       await prisma.praiseConti.create({
         data: {
-          title: file.name.replace(/\.[^.]+$/, ""),
+          title: file.name
+            .replace(/\.[^.]+$/, "")
+            .replace(/^\([^)]*\)\s*/, "")
+            .replace(/\[찬\]\s*/g, "")
+            .replace(/\+/g, " + ")
+            .replace(/\s+/g, " ")
+            .trim(),
           serviceDate,
           fileName: file.name,
           fileUrl: blob.url,

@@ -204,11 +204,11 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                         {formatDate(conti.serviceDate).match(/\d{4}년/)?.[0]}
                       </div>
                     </td>
-                    <td className="px-6 lg:px-8 py-8 bg-white">
-                      <h3 className="font-serif text-lg font-semibold text-[#022448] mb-1">
+                    <td className="px-6 lg:px-8 py-8 bg-white max-w-[200px] md:max-w-md">
+                      <h3 className="font-serif text-lg font-semibold text-[#022448] mb-1 break-words">
                         {conti.title}
                       </h3>
-                      <p className="text-sm text-[#43474e]">{conti.fileName}</p>
+                      <p className="text-sm text-[#43474e] break-all truncate">{conti.fileName}</p>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
