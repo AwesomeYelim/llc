@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import Image from "next/image"
+import { GalleryLightbox } from "@/components/about/GalleryLightbox"
 
 export const metadata: Metadata = generatePageMetadata(
   "교회 소개",
@@ -198,19 +199,7 @@ export default async function AboutPage() {
         <section className="py-24 px-6 lg:px-12 bg-[#fbf9f6]">
           <div className="max-w-screen-xl mx-auto">
             <h2 className="text-3xl font-serif text-[#022448] mb-12 text-center">포토 갤러리</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {gallery.map((img) => (
-                <div key={img.id} className="relative aspect-square rounded-xl overflow-hidden group">
-                  <Image
-                    src={img.imageUrl}
-                    alt={img.title || "교회 사진"}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                  />
-                </div>
-              ))}
-            </div>
+            <GalleryLightbox images={gallery} />
           </div>
         </section>
       )}

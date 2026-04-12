@@ -22,6 +22,8 @@
 | **인증** | Auth.js (next-auth) v5 beta |
 | **파일 저장소** | Vercel Blob |
 | **리치 텍스트 에디터** | Tiptap 3 |
+| **차트** | Recharts |
+| **QR 코드** | qrcode |
 | **런타임** | React 19, Node.js 20+ |
 | **폰트** | Pretendard Variable, Noto Serif KR |
 
@@ -135,20 +137,25 @@ llc/
 ├── src/
 │   ├── app/
 │   │   ├── (public)/          # 공개 페이지 (Route Group)
-│   │   │   ├── about/         #   교회 소개
+│   │   │   ├── about/         #   교회 소개 (갤러리 라이트박스)
 │   │   │   ├── sermons/       #   설교 목록 및 상세
 │   │   │   ├── blog/          #   블로그
-│   │   │   ├── praise/        #   찬양 콘티 & 가사 PPT
-│   │   │   ├── bulletin/      #   주보 & 예배 PPT
-│   │   │   └── columns/       #   설교 원고(칼럼) 목록 및 상세 (검색/정렬/조회수)
+│   │   │   ├── praise/        #   찬양 콘티 & 가사 PPT (QR 코드)
+│   │   │   ├── bulletin/      #   주보 & 예배 PPT (QR 코드)
+│   │   │   ├── columns/       #   설교 원고(칼럼) 목록 및 상세
+│   │   │   ├── calendar/      #   교회 일정 (월간 캘린더)
+│   │   │   ├── prayer/        #   기도 요청
+│   │   │   └── search/        #   통합 검색 (설교+칼럼+찬양)
 │   │   ├── admin/             # 관리자 페이지
 │   │   │   ├── login/         #   로그인
-│   │   │   ├── dashboard/     #   대시보드
+│   │   │   ├── dashboard/     #   대시보드 (방문자 차트)
 │   │   │   ├── sermons/       #   설교 CRUD
 │   │   │   ├── praise/        #   찬양 콘티 & 가사 PPT 관리
 │   │   │   ├── bulletins/     #   주보/PPT 관리
 │   │   │   ├── columns/       #   설교 원고 관리
 │   │   │   ├── gallery/       #   갤러리 관리
+│   │   │   ├── calendar/      #   교회 일정 관리
+│   │   │   ├── prayer/        #   기도 요청 관리
 │   │   │   └── settings/      #   사이트 설정
 │   │   ├── api/               # API 라우트
 │   │   │   ├── auth/          #   NextAuth 인증
@@ -160,18 +167,32 @@ llc/
 │   │   │   ├── gallery/       #   갤러리 API
 │   │   │   ├── settings/      #   사이트 설정 API
 │   │   │   ├── upload/        #   파일 업로드 (Vercel Blob)
-│   │   │   └── page-views/    #   페이지 조회수
+│   │   │   ├── page-views/    #   페이지 조회수
+│   │   │   ├── events/        #   교회 일정 CRUD API
+│   │   │   ├── prayer/        #   기도 요청 API
+│   │   │   ├── search/        #   통합 검색 API
+│   │   │   └── qr/            #   QR 코드 생성 API
 │   │   ├── page.tsx           # 랜딩 페이지 (홈)
 │   │   ├── layout.tsx         # 루트 레이아웃
 │   │   ├── sitemap.ts         # 사이트맵 생성
 │   │   └── robots.ts          # robots.txt 생성
 │   ├── components/
+│   │   ├── about/             # 교회 소개 컴포넌트
+│   │   │   └── GalleryLightbox.tsx  # 전체화면 갤러리 (키보드 지원)
 │   │   ├── admin/             # 관리자 전용 컴포넌트
 │   │   │   ├── SermonForm.tsx
 │   │   │   ├── ColumnForm.tsx
 │   │   │   ├── FileUploadForm.tsx
 │   │   │   ├── RichTextEditor.tsx
-│   │   │   └── DeleteButton.tsx
+│   │   │   ├── DeleteButton.tsx
+│   │   │   ├── VisitorChart.tsx      # 방문자 차트 (Recharts)
+│   │   │   ├── AdminCalendarClient.tsx
+│   │   │   ├── AdminPrayerClient.tsx
+│   │   │   └── NewEventForm.tsx
+│   │   ├── calendar/          # 캘린더 컴포넌트
+│   │   │   └── CalendarView.tsx  # CSS Grid 월간 캘린더
+│   │   ├── prayer/            # 기도 요청 컴포넌트
+│   │   │   └── PrayerForm.tsx
 │   │   ├── landing/           # 랜딩 페이지 섹션 컴포넌트
 │   │   │   ├── Hero.tsx
 │   │   │   ├── BrandMessage.tsx
@@ -195,7 +216,9 @@ llc/
 │   │       ├── FileUpload.tsx
 │   │       ├── Badge.tsx
 │   │       ├── LoadingSpinner.tsx
-│   │       └── Pagination.tsx
+│   │       ├── Pagination.tsx
+│   │       ├── Skeleton.tsx          # 스켈레톤 로딩
+│   │       └── QRButton.tsx          # QR 코드 팝업 버튼
 │   └── lib/
 │       ├── auth.ts            # Auth.js 설정
 │       ├── prisma.ts          # Prisma 클라이언트 싱글톤
@@ -222,6 +245,8 @@ llc/
 | `GalleryImage` | 갤러리 이미지 (URL, 제목, 카테고리, 정렬 순서) |
 | `SiteSetting` | 사이트 설정 (key-value 형태) |
 | `PageView` | 페이지 조회 기록 |
+| `Event` | 교회 일정 (제목, 설명, 시작일, 종료일, 유형: general/special/worship/meeting) |
+| `PrayerRequest` | 기도 요청 (이름, 내용, 익명 여부, 응답 여부) |
 
 ---
 
@@ -254,16 +279,20 @@ llc/
 
 ## 주요 기능
 
-- **랜딩 페이지** -- 히어로 배너, 비전 메시지, 예배 시간, 최근 설교, 카카오맵, 빠른 링크
+- **랜딩 페이지** -- 히어로 패럴렉스 배너, 비전 메시지, 예배 시간, 최근 설교, 카카오맵, 빠른 링크
 - **설교 관리** -- 설교 등록/수정/삭제, 유튜브 영상 연동, 시리즈 및 태그 분류
 - **설교 원고(칼럼)** -- 매거진 스타일 칼럼 상세 페이지, 검색/정렬(최신순·오래된순·조회순·제목순), 조회수 추적
-- **찬양 콘티 & 가사 PPT** -- Google Drive 자동 동기화, .key→PDF 변환, 코드별/메세지별/절기별 필터, 검색, 다운로드
-- **주보 & 예배 PPT** -- 주보 및 예배 PPT 파일 업로드 및 다운로드
-- **갤러리** -- 교회 사진 업로드 및 카테고리별 관리
+- **찬양 콘티 & 가사 PPT** -- Google Drive 자동 동기화, .key→PDF 변환, 코드별/메세지별/절기별 필터, 검색, 다운로드, QR 코드
+- **주보 & 예배 PPT** -- 주보 및 예배 PPT 파일 업로드 및 다운로드, QR 코드
+- **갤러리** -- 교회 사진 업로드, 전체화면 라이트박스 (키보드 화살표 지원)
+- **교회 일정** -- CSS Grid 월간 캘린더, 이벤트 클릭 상세, 어드민 CRUD
+- **기도 요청** -- 익명/실명 기도 제목 제출, 응답된 기도 공개, 어드민 응답 처리
+- **통합 검색** -- 설교·칼럼·찬양 전체 검색 (`/search?q=`), Navbar 검색 아이콘
 - **자동 동기화** -- YouTube, 네이버 블로그, Google Drive 자동 수집 (Vercel Cron, 매일 오전 6시)
 - **사이트 설정** -- 교회 정보, 예배 시간, 유튜브/블로그 URL 등 동적 설정
+- **방문자 분석** -- 어드민 대시보드에서 최근 7일 방문자 차트(Recharts), 인기 페이지 순위
 - **SEO** -- 사이트맵, robots.txt, JSON-LD 구조화 데이터, Open Graph 메타태그
-- **성능 최적화** -- SSG/ISR(5분 캐시), DB 인덱스, unstable_cache, 서울 리전(icn1), 로딩 스켈레톤
+- **성능 최적화** -- SSG/ISR(5분 캐시), DB 인덱스, unstable_cache, 서울 리전(icn1), 스켈레톤 로딩
 - **반응형 디자인** -- 모바일/태블릿/데스크톱 대응
 
 ---

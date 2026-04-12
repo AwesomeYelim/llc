@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -13,12 +13,17 @@ const navLinks = [
   { href: "/columns", label: "설교칼럼" },
   { href: "/praise", label: "찬양" },
   { href: "/bulletin", label: "주보" },
+  { href: "/calendar", label: "일정" },
 ]
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const searchRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -28,7 +33,21 @@ export function Navbar() {
 
   useEffect(() => {
     setMobileOpen(false)
+    setSearchOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    if (searchOpen) searchRef.current?.focus()
+  }, [searchOpen])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchOpen(false)
+      setSearchQuery("")
+    }
+  }
 
   const isHome = pathname === "/"
   const showDark = scrolled || !isHome
@@ -90,6 +109,49 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+          </div>
+
+          {/* Search icon (desktop) */}
+          <div className="hidden lg:flex items-center">
+            {searchOpen ? (
+              <form onSubmit={handleSearch} className="flex items-center gap-2">
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="검색..."
+                  className={cn(
+                    "w-48 px-3 py-1.5 rounded-lg text-sm border focus:outline-none transition-colors",
+                    showDark
+                      ? "bg-white border-[#e4e2df] text-[#022448] focus:border-[#022448]"
+                      : "bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-white/50"
+                  )}
+                  onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className={cn(
+                    "p-1 rounded",
+                    showDark ? "text-[#43474e] hover:text-[#022448]" : "text-white/70 hover:text-white"
+                  )}
+                >
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              </form>
+            ) : (
+              <button
+                onClick={() => setSearchOpen(true)}
+                aria-label="검색"
+                className={cn(
+                  "p-2 rounded-lg transition-colors",
+                  showDark ? "text-[#1e3a5f] hover:text-[#795900]" : "text-white/90 hover:text-white"
+                )}
+              >
+                <span className="material-symbols-outlined text-xl">search</span>
+              </button>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -170,6 +232,13 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                <Link
+                  href="/search"
+                  className="flex items-center gap-2 py-3 font-serif text-lg text-[#1e3a5f] hover:text-[#795900]"
+                >
+                  <span className="material-symbols-outlined text-xl">search</span>
+                  검색
+                </Link>
               </div>
             </motion.div>
           </>

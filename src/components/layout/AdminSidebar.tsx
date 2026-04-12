@@ -11,6 +11,8 @@ const menuItems = [
   { href: "/admin/bulletins", label: "주보/PPT", icon: "📋" },
   { href: "/admin/columns", label: "설교 원고", icon: "📝" },
   { href: "/admin/gallery", label: "갤러리", icon: "🖼" },
+  { href: "/admin/calendar", label: "교회 일정", icon: "📅" },
+  { href: "/admin/prayer", label: "기도 요청", icon: "🙏" },
   { href: "/admin/settings", label: "사이트 설정", icon: "⚙️" },
 ]
 

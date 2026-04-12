@@ -156,3 +156,29 @@ model PageView {
 
   @@map("page_views")
 }
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?   @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  isAllDay    Boolean   @default(true)
+  eventType   String    @default("general") // general, special, worship, meeting
+  createdAt   DateTime  @default(now())
+
+  @@index([startDate])
+  @@map("events")
+}
+
+model PrayerRequest {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("익명")
+  content     String   @db.Text
+  isAnonymous Boolean  @default(false)
+  isAnswered  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("prayer_requests")
+}

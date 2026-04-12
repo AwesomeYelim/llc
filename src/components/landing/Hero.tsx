@@ -1,14 +1,18 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 
 export function Hero() {
+  const { scrollY } = useScroll()
+  const bgY = useTransform(scrollY, [0, 600], ["0%", "30%"])
+  const textY = useTransform(scrollY, [0, 600], ["0%", "-15%"])
+
   return (
     <section className="relative h-[90vh] min-h-[600px] flex items-center overflow-hidden">
-      {/* Background photo */}
-      <div className="absolute inset-0 z-0">
+      {/* Background photo with parallax */}
+      <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>
         <Image
           src="/images/hero_bg.jpg"
           alt="동남 생명의 빛 교회 예배당"
@@ -17,9 +21,9 @@ export function Hero() {
           priority
         />
         <div className="absolute inset-0 editorial-gradient opacity-60" />
-      </div>
+      </motion.div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
+      <motion.div style={{ y: textY }} className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
         <div className="max-w-2xl">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -70,7 +74,7 @@ export function Hero() {
             </Link>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div

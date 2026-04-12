@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { DownloadButton } from "@/components/DownloadButton"
+import { QRButton } from "@/components/ui/QRButton"
 
 interface ContiItem {
   id: number
@@ -233,7 +234,11 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                       <span className="text-[#43474e] text-sm">{conti.downloadCount}회</span>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2 flex-wrap">
+                        <QRButton
+                          url={conti.fileUrl}
+                          title={conti.title}
+                        />
                         <a
                           href={`/api/praise/${conti.id}?view=1`}
                           target="_blank"

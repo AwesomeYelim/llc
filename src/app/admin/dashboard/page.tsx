@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import { AdminLayout } from "@/components/layout/AdminLayout"
 import Link from "next/link"
 import { SyncButtons } from "@/components/admin/SyncButtons"
+import { VisitorChart } from "@/components/admin/VisitorChart"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -17,6 +18,41 @@ export default async function DashboardPage() {
       prisma.bulletin.count(),
       prisma.galleryImage.count(),
     ])
+
+  // Visitor analytics: last 7 days
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+  sevenDaysAgo.setHours(0, 0, 0, 0)
+
+  const recentViews = await prisma.pageView.findMany({
+    where: { createdAt: { gte: sevenDaysAgo } },
+    select: { createdAt: true, path: true },
+  })
+
+  // Group by day
+  const dayMap: Record<string, number> = {}
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const key = `${d.getMonth() + 1}/${d.getDate()}`
+    dayMap[key] = 0
+  }
+  recentViews.forEach((v) => {
+    const d = new Date(v.createdAt)
+    const key = `${d.getMonth() + 1}/${d.getDate()}`
+    if (key in dayMap) dayMap[key]++
+  })
+  const dailyData = Object.entries(dayMap).map(([date, count]) => ({ date, count }))
+
+  // Top pages
+  const pageMap: Record<string, number> = {}
+  recentViews.forEach((v) => {
+    pageMap[v.path] = (pageMap[v.path] ?? 0) + 1
+  })
+  const topPages = Object.entries(pageMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([path, count]) => ({ path, count }))
 
   const stats = [
     { label: "설교 영상", count: sermonCount, href: "/admin/sermons", icon: "🎬" },
@@ -53,6 +89,11 @@ export default async function DashboardPage() {
 
       <div className="mt-8">
         <SyncButtons />
+      </div>
+
+      {/* Visitor chart */}
+      <div className="mt-6">
+        <VisitorChart dailyData={dailyData} topPages={topPages} />
       </div>
 
       <div className="mt-4 bg-white rounded-xl border border-gray-100 p-6">

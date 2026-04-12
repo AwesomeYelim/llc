@@ -10,6 +10,8 @@ const navLinks = [
 const infoLinks = [
   { href: "/praise", label: "찬양콘티" },
   { href: "/bulletin", label: "주보" },
+  { href: "/calendar", label: "교회일정" },
+  { href: "/prayer", label: "기도요청" },
 ]
 
 export function Footer() {

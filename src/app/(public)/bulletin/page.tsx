@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { formatDate, formatFileSize } from "@/lib/utils"
+import { QRButton } from "@/components/ui/QRButton"
 
 export const metadata: Metadata = generatePageMetadata(
   "주보 & 예배 PPT",
@@ -61,16 +62,18 @@ export default async function BulletinPage() {
                       <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl">
                         <div className="flex justify-end gap-2 flex-wrap">
                           {bulletin.files.map((file) => (
-                            <a
-                              key={file.id}
-                              href={`/api/bulletins/${file.id}/download?download=1`}
-                              download={file.fileName}
-                              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-sm">download</span>
-                              {file.fileName.endsWith(".zip") ? "주보+PPT" : file.fileName.split(".").pop()?.toUpperCase()}
-                              <span className="text-white/60 text-xs">({formatFileSize(file.fileSize)})</span>
-                            </a>
+                            <div key={file.id} className="flex items-center gap-2">
+                              <QRButton url={file.fileUrl} title={bulletin.title} />
+                              <a
+                                href={`/api/bulletins/${file.id}/download?download=1`}
+                                download={file.fileName}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-sm">download</span>
+                                {file.fileName.endsWith(".zip") ? "주보+PPT" : file.fileName.split(".").pop()?.toUpperCase()}
+                                <span className="text-white/60 text-xs">({formatFileSize(file.fileSize)})</span>
+                              </a>
+                            </div>
                           ))}
                         </div>
                       </td>
