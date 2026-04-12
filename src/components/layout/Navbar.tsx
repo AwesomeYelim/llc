@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -43,7 +44,22 @@ export function Navbar() {
         )}
       >
         <div className="flex justify-between items-center px-6 lg:px-12 py-3 lg:py-4 max-w-screen-2xl mx-auto">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center gap-2.5">
+            {showDark && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Image
+                  src="/images/logo_dark.png"
+                  alt="동남 생명의 빛 교회"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 object-contain"
+                />
+              </motion.div>
+            )}
             <span
               className={cn(
                 "font-serif text-lg lg:text-xl font-bold transition-colors duration-300",
@@ -128,7 +144,14 @@ export function Navbar() {
               className="fixed top-0 right-0 bottom-0 w-72 bg-[#fbf9f6] z-50 shadow-xl lg:hidden"
             >
               <div className="p-6 pt-8">
-                <div className="mb-8">
+                <div className="mb-8 flex items-center gap-2.5">
+                  <Image
+                    src="/images/logo_dark.png"
+                    alt="동남 생명의 빛 교회"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
                   <span className="font-serif text-lg font-bold text-[#022448]">
                     Light of Life Church
                   </span>
