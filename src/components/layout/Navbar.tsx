@@ -27,13 +27,14 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   useEffect(() => {
     setMobileOpen(false)
     setSearchOpen(false)
+    setSearchQuery("")
   }, [pathname])
 
   useEffect(() => {
@@ -54,31 +55,30 @@ export function Navbar() {
 
   return (
     <>
+      {/* ── Main nav bar ── */}
       <nav
         className={cn(
           "fixed top-0 w-full z-50 transition-all duration-300",
           showDark
-            ? "bg-[#fbf9f6]/80 backdrop-blur-md shadow-sm"
+            ? "bg-[#fbf9f6]/90 backdrop-blur-md shadow-sm"
             : "bg-transparent"
         )}
       >
-        <div className="flex justify-between items-center px-6 lg:px-12 py-3 lg:py-4 max-w-screen-2xl mx-auto">
-          <Link href="/" className="flex items-center gap-2.5">
-            {showDark && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Image
-                  src="/images/logo_dark.png"
-                  alt="동남 생명의 빛 교회"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 object-contain"
-                />
-              </motion.div>
-            )}
+        <div className="h-16 flex items-center justify-between px-6 lg:px-12 max-w-screen-2xl mx-auto">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 relative">
+              <Image
+                src="/images/logo_dark.png"
+                alt="동남 생명의 빛 교회"
+                fill
+                className={cn(
+                  "object-contain transition-opacity duration-300",
+                  showDark ? "opacity-100" : "opacity-0"
+                )}
+              />
+            </div>
             <span
               className={cn(
                 "font-serif text-lg lg:text-xl font-bold transition-colors duration-300",
@@ -89,109 +89,142 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "font-serif text-base tracking-tight transition-colors duration-300",
-                  showDark
-                    ? "text-[#1e3a5f] hover:text-[#795900]"
-                    : "text-white/90 hover:text-white",
-                  pathname === link.href &&
-                    (showDark
-                      ? "text-[#795900] border-b-2 border-[#795900] pb-1"
-                      : "text-white border-b-2 border-white pb-1")
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Search icon (desktop) */}
-          <div className="hidden lg:flex items-center">
-            {searchOpen ? (
-              <form onSubmit={handleSearch} className="flex items-center gap-2">
-                <input
-                  ref={searchRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="검색..."
+          {/* Desktop nav links — 중앙 */}
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+            {navLinks.map((link) => {
+              const active = pathname === link.href
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
                   className={cn(
-                    "w-48 px-3 py-1.5 rounded-lg text-sm border focus:outline-none transition-colors",
+                    "relative font-serif text-sm xl:text-base tracking-tight transition-colors duration-200 py-1",
                     showDark
-                      ? "bg-white border-[#e4e2df] text-[#022448] focus:border-[#022448]"
-                      : "bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-white/50"
-                  )}
-                  onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(false)}
-                  className={cn(
-                    "p-1 rounded",
-                    showDark ? "text-[#43474e] hover:text-[#022448]" : "text-white/70 hover:text-white"
+                      ? "text-[#1e3a5f] hover:text-[#795900]"
+                      : "text-white/90 hover:text-white",
+                    active && (showDark ? "text-[#795900]" : "text-white")
                   )}
                 >
-                  <span className="material-symbols-outlined text-xl">close</span>
-                </button>
-              </form>
-            ) : (
-              <button
-                onClick={() => setSearchOpen(true)}
-                aria-label="검색"
-                className={cn(
-                  "p-2 rounded-lg transition-colors",
-                  showDark ? "text-[#1e3a5f] hover:text-[#795900]" : "text-white/90 hover:text-white"
-                )}
-              >
-                <span className="material-symbols-outlined text-xl">search</span>
-              </button>
-            )}
+                  {link.label}
+                  {active && (
+                    <span
+                      className={cn(
+                        "absolute inset-x-0 -bottom-px h-0.5 rounded-full",
+                        showDark ? "bg-[#795900]" : "bg-white"
+                      )}
+                    />
+                  )}
+                </Link>
+              )
+            })}
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden p-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="메뉴"
-          >
-            <div className="w-6 h-5 relative flex flex-col justify-between">
+          {/* 우측: 검색 아이콘 + 모바일 햄버거 */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* 검색 아이콘 — 레이아웃 고정 */}
+            <button
+              onClick={() => setSearchOpen((o) => !o)}
+              aria-label="검색"
+              className={cn(
+                "hidden lg:flex w-9 h-9 items-center justify-center rounded-lg transition-colors",
+                searchOpen
+                  ? showDark
+                    ? "bg-[#f0ede9] text-[#022448]"
+                    : "bg-white/20 text-white"
+                  : showDark
+                  ? "text-[#1e3a5f] hover:bg-[#f0ede9] hover:text-[#022448]"
+                  : "text-white/90 hover:bg-white/10 hover:text-white"
+              )}
+            >
+              <span className="material-symbols-outlined text-xl leading-none">
+                {searchOpen ? "close" : "search"}
+              </span>
+            </button>
+
+            {/* 모바일 햄버거 */}
+            <button
+              className={cn(
+                "lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg transition-colors",
+                showDark ? "text-[#022448]" : "text-white"
+              )}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="메뉴"
+            >
               <span
                 className={cn(
-                  "w-full h-0.5 transition-all origin-left",
-                  showDark ? "bg-[#022448]" : "bg-white",
-                  mobileOpen && "rotate-45"
+                  "w-5 h-0.5 bg-current rounded-full transition-all duration-200 origin-center",
+                  mobileOpen && "translate-y-2 rotate-45"
                 )}
               />
               <span
                 className={cn(
-                  "w-full h-0.5 transition-all",
-                  showDark ? "bg-[#022448]" : "bg-white",
-                  mobileOpen && "opacity-0"
+                  "w-5 h-0.5 bg-current rounded-full transition-all duration-200",
+                  mobileOpen && "opacity-0 scale-x-0"
                 )}
               />
               <span
                 className={cn(
-                  "w-full h-0.5 transition-all origin-left",
-                  showDark ? "bg-[#022448]" : "bg-white",
-                  mobileOpen && "-rotate-45"
+                  "w-5 h-0.5 bg-current rounded-full transition-all duration-200 origin-center",
+                  mobileOpen && "-translate-y-2 -rotate-45"
                 )}
               />
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* ── 검색 오버레이 (navbar 아래로 슬라이드) ── */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            key="search-overlay"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className="fixed top-16 inset-x-0 z-40 bg-[#fbf9f6]/95 backdrop-blur-md border-b border-[#e4e2df] shadow-sm"
+          >
+            <form
+              onSubmit={handleSearch}
+              className="max-w-screen-2xl mx-auto px-6 lg:px-12 py-3 flex items-center gap-3"
+            >
+              <span className="material-symbols-outlined text-[#74777f] text-xl shrink-0">search</span>
+              <input
+                ref={searchRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="설교, 칼럼, 찬양 검색..."
+                onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                className="flex-1 bg-transparent text-[#022448] placeholder-[#74777f] text-base focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  type="submit"
+                  className="shrink-0 px-3 py-1 bg-[#022448] text-white text-sm rounded-lg hover:bg-[#1e3a5f] transition-colors"
+                >
+                  검색
+                </button>
+              )}
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 검색 오버레이 바깥 클릭 닫기 */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-30 top-16"
+          onClick={() => setSearchOpen(false)}
+        />
+      )}
+
+      {/* ── 모바일 사이드 메뉴 ── */}
       <AnimatePresence>
         {mobileOpen && (
           <>
             <motion.div
+              key="mobile-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -199,47 +232,67 @@ export function Navbar() {
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
+              key="mobile-menu"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-[#fbf9f6] z-50 shadow-xl lg:hidden"
+              transition={{ type: "tween", duration: 0.25 }}
+              className="fixed top-0 right-0 bottom-0 w-64 bg-[#fbf9f6] z-50 shadow-xl lg:hidden flex flex-col"
             >
-              <div className="p-6 pt-8">
-                <div className="mb-8 flex items-center gap-2.5">
+              {/* 헤더 */}
+              <div className="h-16 flex items-center justify-between px-5 border-b border-[#e4e2df]">
+                <div className="flex items-center gap-2">
                   <Image
                     src="/images/logo_dark.png"
                     alt="동남 생명의 빛 교회"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 object-contain"
+                    width={28}
+                    height={28}
+                    className="w-7 h-7 object-contain"
                   />
-                  <span className="font-serif text-lg font-bold text-[#022448]">
-                    Light of Life Church
+                  <span className="font-serif text-base font-bold text-[#022448]">
+                    동남 생명의 빛
                   </span>
                 </div>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center text-[#74777f] hover:text-[#022448]"
+                >
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
+
+              {/* 링크 목록 */}
+              <nav className="flex-1 overflow-y-auto py-2">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "block py-3 font-serif text-lg border-b border-[#e4e2df]",
+                      "flex items-center px-5 py-3.5 font-serif text-base transition-colors",
                       pathname === link.href
-                        ? "text-[#795900] font-bold"
-                        : "text-[#1e3a5f] hover:text-[#795900]"
+                        ? "text-[#795900] bg-[#fdf5e6] font-semibold"
+                        : "text-[#1e3a5f] hover:bg-[#f5f3f0] hover:text-[#795900]"
                     )}
                   >
                     {link.label}
                   </Link>
                 ))}
+                <div className="mx-5 my-2 border-t border-[#e4e2df]" />
                 <Link
                   href="/search"
-                  className="flex items-center gap-2 py-3 font-serif text-lg text-[#1e3a5f] hover:text-[#795900]"
+                  className="flex items-center gap-2.5 px-5 py-3.5 font-serif text-base text-[#1e3a5f] hover:bg-[#f5f3f0] hover:text-[#795900] transition-colors"
                 >
-                  <span className="material-symbols-outlined text-xl">search</span>
-                  검색
+                  <span className="material-symbols-outlined text-lg">search</span>
+                  통합 검색
                 </Link>
-              </div>
+                <Link
+                  href="/prayer"
+                  className="flex items-center gap-2.5 px-5 py-3.5 font-serif text-base text-[#1e3a5f] hover:bg-[#f5f3f0] hover:text-[#795900] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">favorite</span>
+                  기도 요청
+                </Link>
+              </nav>
             </motion.div>
           </>
         )}
