@@ -57,14 +57,19 @@ export function Navbar() {
     <>
       {/* ── Main nav bar ── */}
       <nav
-        className={cn(
-          "fixed top-0 w-full z-50 transition-all duration-300",
-          showDark
-            ? "bg-[#fbf9f6]/90 backdrop-blur-md shadow-sm"
-            : "bg-transparent"
-        )}
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{ transform: "translateZ(0)" }}
       >
-        <div className="h-16 flex items-center justify-between px-6 lg:px-12 max-w-screen-2xl mx-auto">
+        {/* bg layer — transition은 여기서만 */}
+        <div
+          className={cn(
+            "absolute inset-0 transition-[background-color,box-shadow] duration-300",
+            showDark
+              ? "bg-[#fbf9f6]/90 backdrop-blur-md shadow-sm"
+              : "bg-transparent"
+          )}
+        />
+        <div className="relative h-16 flex items-center justify-between px-6 lg:px-12 max-w-screen-2xl mx-auto">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -178,10 +183,10 @@ export function Navbar() {
         {searchOpen && (
           <motion.div
             key="search-overlay"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
             className="fixed top-16 inset-x-0 z-40 bg-[#fbf9f6]/95 backdrop-blur-md border-b border-[#e4e2df] shadow-sm"
           >
             <form
