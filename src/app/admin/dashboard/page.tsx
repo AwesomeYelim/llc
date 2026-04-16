@@ -10,49 +10,57 @@ export default async function DashboardPage() {
   const session = await auth()
   if (!session) redirect("/admin/login")
 
-  const [sermonCount, columnCount, praiseCount, bulletinCount, galleryCount] =
+  // Visitor analytics: last 7 days
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+  sevenDaysAgo.setHours(0, 0, 0, 0)
+
+  const [sermonCount, columnCount, praiseCount, bulletinCount, galleryCount, rawDailyStats, rawTopPages] =
     await Promise.all([
       prisma.sermon.count({ where: { youtubeId: { not: null } } }),
       prisma.column.count(),
       prisma.praiseConti.count(),
       prisma.bulletin.count(),
       prisma.galleryImage.count(),
+      // DB-level date aggregation for daily visitor counts
+      prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+        SELECT
+          TO_CHAR("createdAt", 'YYYY-MM-DD') as date,
+          COUNT(*) as count
+        FROM page_views
+        WHERE "createdAt" >= ${sevenDaysAgo}
+        GROUP BY TO_CHAR("createdAt", 'YYYY-MM-DD')
+        ORDER BY date ASC
+      `,
+      // DB-level aggregation for top pages
+      prisma.$queryRaw<Array<{ path: string; count: bigint }>>`
+        SELECT
+          path,
+          COUNT(*) as count
+        FROM page_views
+        WHERE "createdAt" >= ${sevenDaysAgo}
+        GROUP BY path
+        ORDER BY count DESC
+        LIMIT 8
+      `,
     ])
 
-  // Visitor analytics: last 7 days
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
-  sevenDaysAgo.setHours(0, 0, 0, 0)
-
-  const recentViews = await prisma.pageView.findMany({
-    where: { createdAt: { gte: sevenDaysAgo } },
-    select: { createdAt: true, path: true },
+  // Build 7-day array, filling missing days with 0
+  const dailyStatsMap = new Map(
+    rawDailyStats.map((r) => [r.date, Number(r.count)])
+  )
+  const dailyData = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(sevenDaysAgo)
+    d.setDate(d.getDate() + i)
+    const dateStr = `${d.getMonth() + 1}/${d.getDate()}`
+    const isoDate = d.toISOString().split("T")[0]
+    return { date: dateStr, count: dailyStatsMap.get(isoDate) ?? 0 }
   })
 
-  // Group by day
-  const dayMap: Record<string, number> = {}
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const key = `${d.getMonth() + 1}/${d.getDate()}`
-    dayMap[key] = 0
-  }
-  recentViews.forEach((v) => {
-    const d = new Date(v.createdAt)
-    const key = `${d.getMonth() + 1}/${d.getDate()}`
-    if (key in dayMap) dayMap[key]++
-  })
-  const dailyData = Object.entries(dayMap).map(([date, count]) => ({ date, count }))
-
-  // Top pages
-  const pageMap: Record<string, number> = {}
-  recentViews.forEach((v) => {
-    pageMap[v.path] = (pageMap[v.path] ?? 0) + 1
-  })
-  const topPages = Object.entries(pageMap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([path, count]) => ({ path, count }))
+  const topPages = rawTopPages.map((r) => ({
+    path: r.path,
+    count: Number(r.count),
+  }))
 
   const stats = [
     { label: "설교 영상", count: sermonCount, href: "/admin/sermons", icon: "🎬" },
