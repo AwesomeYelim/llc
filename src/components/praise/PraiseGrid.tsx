@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { DownloadButton } from "@/components/DownloadButton"
 import { QRButton } from "@/components/ui/QRButton"
+import { formatDate } from "@/lib/utils"
 
 interface ContiItem {
   id: number
@@ -18,11 +19,6 @@ interface ContiItem {
 }
 
 type FilterType = "all" | "key" | "theme" | "season"
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
-}
 
 export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [filterType, setFilterType] = useState<FilterType>("all")

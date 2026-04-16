@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { EVENT_TYPE_LABELS } from "@/lib/constants"
 
-const EVENT_TYPES = [
-  { value: "general", label: "일반" },
-  { value: "worship", label: "예배" },
-  { value: "special", label: "특별" },
-  { value: "meeting", label: "모임" },
-]
+const EVENT_TYPES = Object.entries(EVENT_TYPE_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}))
 
 export function NewEventForm() {
   const router = useRouter()

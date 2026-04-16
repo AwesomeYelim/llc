@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { EVENT_TYPE_LABELS } from "@/lib/constants"
 
 interface AdminEvent {
   id: number
@@ -11,13 +12,6 @@ interface AdminEvent {
   endDate: string | null
   isAllDay: boolean
   eventType: string
-}
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  general: "일반",
-  special: "특별",
-  worship: "예배",
-  meeting: "모임",
 }
 
 export function AdminCalendarClient({ events }: { events: AdminEvent[] }) {

@@ -2,19 +2,13 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { CalendarView } from "@/components/calendar/CalendarView"
+import { EVENT_TYPE_LABELS } from "@/lib/constants"
 
 export const metadata: Metadata = generatePageMetadata(
   "교회 일정",
   "동남 생명의 빛 교회 월간 일정표입니다.",
   "/calendar"
 )
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  general: "일반",
-  special: "특별",
-  worship: "예배",
-  meeting: "모임",
-}
 
 export default async function CalendarPage({
   searchParams,

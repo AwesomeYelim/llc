@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import Link from "next/link"
 import Image from "next/image"
 import { formatDate, serviceTypeLabel, getYoutubeThumbnail } from "@/lib/utils"
+import { SermonPagination } from "@/components/ui/SermonPagination"
 
 export const metadata: Metadata = generatePageMetadata(
   "설교 영상",
@@ -145,39 +146,11 @@ export default async function SermonsPage({
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-24 flex justify-center items-center gap-3">
-            {page > 1 && (
-              <Link
-                href={`/sermons?page=${page - 1}${serviceType ? `&serviceType=${serviceType}` : ""}`}
-                className="w-12 h-12 flex items-center justify-center rounded-full bg-[#f5f3f0] text-[#022448] hover:bg-[#022448] hover:text-white transition-all"
-              >
-                <span className="material-symbols-outlined">chevron_left</span>
-              </Link>
-            )}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <Link
-                key={p}
-                href={`/sermons?page=${p}${serviceType ? `&serviceType=${serviceType}` : ""}`}
-                className={`w-12 h-12 flex items-center justify-center rounded-full font-bold transition-all ${
-                  p === page
-                    ? "bg-[#022448] text-white"
-                    : "bg-[#f5f3f0] text-[#022448] hover:bg-[#022448] hover:text-white"
-                }`}
-              >
-                {p}
-              </Link>
-            ))}
-            {page < totalPages && (
-              <Link
-                href={`/sermons?page=${page + 1}${serviceType ? `&serviceType=${serviceType}` : ""}`}
-                className="w-12 h-12 flex items-center justify-center rounded-full bg-[#f5f3f0] text-[#022448] hover:bg-[#022448] hover:text-white transition-all"
-              >
-                <span className="material-symbols-outlined">chevron_right</span>
-              </Link>
-            )}
-          </div>
-        )}
+        <SermonPagination
+          currentPage={page}
+          totalPages={totalPages}
+          serviceType={serviceType}
+        />
       </section>
     </div>
   )
