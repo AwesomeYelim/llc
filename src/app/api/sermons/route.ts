@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidateTag, revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  revalidateTag("home")
+  revalidatePath("/sermons")
   notifyIndexNow([`/sermons/${sermon.id}`])
   return NextResponse.json(sermon, { status: 201 })
 }

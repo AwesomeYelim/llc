@@ -21,7 +21,7 @@ const getColumn = unstable_cache(
       include: { sermon: true },
     })
   },
-  ["column-detail"],
+  ["column-detail", String(id)],
   { revalidate: 300, tags: ["columns"] }
 )
 
@@ -40,7 +40,7 @@ const getRecentColumns = unstable_cache(
       },
     })
   },
-  ["recent-columns"],
+  ["recent-columns", String(excludeId)],
   { revalidate: 300, tags: ["columns"] }
 )
 

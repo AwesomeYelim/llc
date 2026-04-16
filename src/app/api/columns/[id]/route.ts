@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidateTag, revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -38,6 +39,8 @@ export async function PUT(
     },
   })
 
+  revalidateTag("columns")
+  revalidatePath("/columns")
   notifyIndexNow([`/columns/${id}`])
   return NextResponse.json(column)
 }
@@ -51,5 +54,7 @@ export async function DELETE(
 
   const { id } = await params
   await prisma.column.delete({ where: { id: parseInt(id) } })
+  revalidateTag("columns")
+  revalidatePath("/columns")
   return NextResponse.json({ success: true })
 }
