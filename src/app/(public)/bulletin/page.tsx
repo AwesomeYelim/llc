@@ -3,6 +3,9 @@ import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { formatDate, formatFileSize } from "@/lib/utils"
 import { QRButton } from "@/components/ui/QRButton"
+import { PaginationLink } from "@/components/ui/PaginationLink"
+
+const PAGE_SIZE = 10
 
 export const metadata: Metadata = generatePageMetadata(
   "주보 & 예배 PPT",
@@ -10,11 +13,25 @@ export const metadata: Metadata = generatePageMetadata(
   "/bulletin"
 )
 
-export default async function BulletinPage() {
-  const bulletins = await prisma.bulletin.findMany({
-    include: { files: true },
-    orderBy: { serviceDate: "desc" },
-  })
+export default async function BulletinPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageStr } = await searchParams
+  const page = Math.max(1, parseInt(pageStr || "1", 10))
+
+  const [bulletins, total] = await Promise.all([
+    prisma.bulletin.findMany({
+      include: { files: true },
+      orderBy: { serviceDate: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.bulletin.count(),
+  ])
+
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
     <div>
@@ -89,6 +106,7 @@ export default async function BulletinPage() {
             </div>
           )}
         </div>
+        <PaginationLink currentPage={page} totalPages={totalPages} basePath="/bulletin" />
       </section>
     </div>
   )
