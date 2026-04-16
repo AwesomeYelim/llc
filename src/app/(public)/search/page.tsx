@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
+import { formatDate } from "@/lib/utils"
 
 export const metadata: Metadata = generatePageMetadata(
   "통합 검색",
@@ -26,11 +27,12 @@ async function search(q: string): Promise<SearchResult> {
           { scripture: { contains: q, mode: "insensitive" } },
           { summary: { contains: q, mode: "insensitive" } },
           { series: { contains: q, mode: "insensitive" } },
+          { tags: { contains: q, mode: "insensitive" } },
         ],
       },
       orderBy: { sermonDate: "desc" },
       take: 10,
-      select: { id: true, title: true, scripture: true, sermonDate: true, youtubeId: true },
+      select: { id: true, title: true, scripture: true, sermonDate: true, youtubeId: true, tags: true },
     }),
     prisma.column.findMany({
       where: {
@@ -67,15 +69,22 @@ async function search(q: string): Promise<SearchResult> {
   }
 }
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
-}
-
-function highlight(text: string, q: string) {
-  if (!q) return text
-  const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
-  return text.replace(regex, "**$1**")
+function Highlight({ text, q }: { text: string; q: string }) {
+  if (!q || !text) return <>{text}</>
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const regex = new RegExp(`(${escaped})`, "gi")
+  const parts = text.split(regex)
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className="bg-[#ffdfa0] text-[#022448] rounded px-0.5 not-italic">{part}</mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  )
 }
 
 export default async function SearchPage({
@@ -167,7 +176,7 @@ export default async function SearchPage({
                   )}
                   <div>
                     <p className="font-serif font-semibold text-[#022448] group-hover:text-[#795900] transition-colors">
-                      {s.title}
+                      <Highlight text={s.title} q={q} />
                     </p>
                     <p className="text-sm text-[#74777f] mt-1">{s.scripture} · {formatDate(s.sermonDate)}</p>
                   </div>
@@ -193,7 +202,7 @@ export default async function SearchPage({
                 >
                   <div>
                     <p className="font-serif font-semibold text-[#022448] group-hover:text-[#795900] transition-colors">
-                      {c.title}
+                      <Highlight text={c.title} q={q} />
                     </p>
                     <p className="text-sm text-[#74777f] mt-1">
                       {c.scripture && `${c.scripture} · `}{formatDate(c.createdAt)}
@@ -221,7 +230,7 @@ export default async function SearchPage({
                 >
                   <div>
                     <p className="font-serif font-semibold text-[#022448] group-hover:text-[#795900] transition-colors">
-                      {p.title}
+                      <Highlight text={p.title} q={q} />
                     </p>
                     <p className="text-sm text-[#74777f] mt-1">
                       {formatDate(p.serviceDate)}
