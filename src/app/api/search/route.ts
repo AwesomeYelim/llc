@@ -15,11 +15,12 @@ export async function GET(req: NextRequest) {
           { scripture: { contains: q, mode: "insensitive" } },
           { summary: { contains: q, mode: "insensitive" } },
           { series: { contains: q, mode: "insensitive" } },
+          { tags: { contains: q, mode: "insensitive" } },
         ],
       },
       orderBy: { sermonDate: "desc" },
       take: 10,
-      select: { id: true, title: true, scripture: true, sermonDate: true, youtubeId: true },
+      select: { id: true, title: true, scripture: true, sermonDate: true, youtubeId: true, tags: true },
     }),
     prisma.column.findMany({
       where: {
