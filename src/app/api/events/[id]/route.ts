@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 
@@ -21,6 +22,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     },
   })
 
+  revalidatePath("/calendar")
   return NextResponse.json(event)
 }
 
@@ -30,6 +32,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const { id } = await params
   await prisma.event.delete({ where: { id: Number(id) } })
-
+  revalidatePath("/calendar")
   return NextResponse.json({ success: true })
 }
