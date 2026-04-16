@@ -37,3 +37,15 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(prayer, { status: 201 })
 }
 
+export async function DELETE(req: NextRequest) {
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const id = req.nextUrl.searchParams.get("id")
+  if (!id || isNaN(Number(id))) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 })
+  }
+
+  await prisma.prayerRequest.delete({ where: { id: Number(id) } })
+  return NextResponse.json({ success: true })
+}
