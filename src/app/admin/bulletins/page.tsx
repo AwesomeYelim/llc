@@ -53,7 +53,15 @@ export default async function AdminBulletinsPage() {
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-500">{formatDateShort(bulletin.serviceDate)}</td>
                 <td className="px-4 py-3 text-right">
-                  <DeleteButton id={bulletin.id} endpoint="/api/bulletins" />
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/admin/bulletins/${bulletin.id}/edit`}
+                      className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                      수정
+                    </Link>
+                    <DeleteButton id={bulletin.id} endpoint="/api/bulletins" />
+                  </div>
                 </td>
               </tr>
             ))}
