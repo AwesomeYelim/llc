@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -11,6 +12,7 @@ export async function DELETE(
 
   const { id } = await params
   await prisma.praiseConti.delete({ where: { id: parseInt(id) } })
+  revalidatePath("/praise")
   return NextResponse.json({ success: true })
 }
 
@@ -49,5 +51,30 @@ export async function GET(
     })
   }
 
+  return NextResponse.json(conti)
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = await params
+  const body = await req.json()
+
+  const conti = await prisma.praiseConti.update({
+    where: { id: parseInt(id) },
+    data: {
+      title: body.title,
+      serviceDate: body.serviceDate ? new Date(body.serviceDate) : undefined,
+      musicalKey: body.musicalKey || null,
+      theme: body.theme || null,
+      season: body.season || null,
+    },
+  })
+
+  revalidatePath("/praise")
   return NextResponse.json(conti)
 }
