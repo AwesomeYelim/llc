@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -46,5 +47,6 @@ export async function POST(request: NextRequest) {
     include: { files: true },
   })
 
+  revalidatePath("/bulletin")
   return NextResponse.json(bulletin, { status: 201 })
 }

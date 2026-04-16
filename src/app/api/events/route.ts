@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 
@@ -37,5 +38,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  revalidatePath("/calendar")
   return NextResponse.json(event, { status: 201 })
 }

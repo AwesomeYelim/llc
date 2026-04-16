@@ -2,6 +2,9 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { PraiseGrid } from "@/components/praise/PraiseGrid"
+import { PaginationLink } from "@/components/ui/PaginationLink"
+
+const PAGE_SIZE = 12
 
 export const metadata: Metadata = generatePageMetadata(
   "찬양 콘티 & 가사 PPT",
@@ -9,12 +12,26 @@ export const metadata: Metadata = generatePageMetadata(
   "/praise"
 )
 
-export default async function PraisePage() {
-  const contis = await prisma.praiseConti.findMany({
-    orderBy: { serviceDate: "desc" },
-  })
+export default async function PraisePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageStr } = await searchParams
+  const page = Math.max(1, parseInt(pageStr || "1", 10))
 
-  const totalDownloads = contis.reduce((sum, c) => sum + c.downloadCount, 0)
+  const [contis, total, totalDownloadsResult] = await Promise.all([
+    prisma.praiseConti.findMany({
+      orderBy: { serviceDate: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.praiseConti.count(),
+    prisma.praiseConti.aggregate({ _sum: { downloadCount: true } }),
+  ])
+
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalDownloads = totalDownloadsResult._sum.downloadCount || 0
 
   // Serialize for client component
   const serialized = contis.map((c) => ({
@@ -51,7 +68,7 @@ export default async function PraisePage() {
           <div className="flex items-center gap-4">
             <div className="p-4 bg-[#f5f3f0] rounded-xl">
               <span className="text-xs text-[#43474e] block mb-1">총 리소스</span>
-              <span className="font-serif text-2xl font-bold text-[#022448]">{contis.length}개</span>
+              <span className="font-serif text-2xl font-bold text-[#022448]">{total}개</span>
             </div>
             <div className="p-4 bg-[#f5f3f0] rounded-xl">
               <span className="text-xs text-[#43474e] block mb-1">총 다운로드</span>
@@ -77,6 +94,7 @@ export default async function PraisePage() {
       {/* Filterable Grid */}
       <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
         <PraiseGrid contis={serialized} />
+        <PaginationLink currentPage={page} totalPages={totalPages} basePath="/praise" />
       </section>
     </div>
   )

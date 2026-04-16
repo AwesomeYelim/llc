@@ -47,7 +47,15 @@ export default async function AdminPraisePage() {
                 <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{conti.downloadCount}회</td>
                 <td className="px-4 py-3 text-sm text-gray-500">{formatDateShort(conti.serviceDate)}</td>
                 <td className="px-4 py-3 text-right">
-                  <DeleteButton id={conti.id} endpoint="/api/praise" />
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/admin/praise/${conti.id}/edit`}
+                      className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                      수정
+                    </Link>
+                    <DeleteButton id={conti.id} endpoint="/api/praise" />
+                  </div>
                 </td>
               </tr>
             ))}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidateTag, revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -36,6 +37,8 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  revalidateTag("columns")
+  revalidatePath("/columns")
   notifyIndexNow([`/columns/${column.id}`])
   return NextResponse.json(column, { status: 201 })
 }

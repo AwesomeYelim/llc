@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 interface Prayer {
   id: number
   name: string
@@ -9,7 +11,15 @@ interface Prayer {
 }
 
 export function AdminPrayerClient({ prayers }: { prayers: Prayer[] }) {
-  if (prayers.length === 0) {
+  const [list, setList] = useState(prayers)
+
+  async function deletePrayer(id: number) {
+    if (!confirm("이 기도 요청을 삭제하시겠습니까?")) return
+    await fetch(`/api/prayer?id=${id}`, { method: "DELETE" })
+    setList((prev) => prev.filter((p) => p.id !== id))
+  }
+
+  if (list.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-500">
         접수된 기도 요청이 없습니다.
@@ -19,8 +29,15 @@ export function AdminPrayerClient({ prayers }: { prayers: Prayer[] }) {
 
   return (
     <div className="space-y-3">
-      {prayers.map((p) => (
-        <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-5">
+      {list.map((p) => (
+        <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-5 relative">
+          <button
+            onClick={() => deletePrayer(p.id)}
+            className="absolute top-3 right-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full p-1 transition-colors"
+            title="삭제"
+          >
+            <span className="material-symbols-outlined text-lg">delete</span>
+          </button>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm font-medium text-gray-800">
               {p.isAnonymous ? "익명" : p.name}
