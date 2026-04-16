@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { revalidateTag, revalidatePath } from "next/cache"
+import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -44,7 +44,6 @@ export async function PUT(
     },
   })
 
-  revalidateTag("home")
   revalidatePath("/sermons")
   notifyIndexNow([`/sermons/${id}`])
   return NextResponse.json(sermon)
@@ -59,7 +58,6 @@ export async function DELETE(
 
   const { id } = await params
   await prisma.sermon.delete({ where: { id: parseInt(id) } })
-  revalidateTag("home")
   revalidatePath("/sermons")
   return NextResponse.json({ success: true })
 }
