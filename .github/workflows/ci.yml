@@ -53,7 +53,7 @@ jobs:
       - name: Run Playwright smoke tests
         run: npm run test:e2e
         env:
-          BASE_URL: https://llc-xi.vercel.app
+          BASE_URL: https://dongnam-llc.vercel.app
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
