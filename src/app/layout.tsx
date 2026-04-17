@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { SITE_NAME, SITE_DESCRIPTION, SITE_KEYWORDS, SITE_URL } from "@/lib/seo"
+import { PageViewTracker } from "@/components/PageViewTracker"
 
 export const metadata: Metadata = {
   title: {
@@ -62,6 +63,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-pretendard antialiased text-[#1b1c1a] bg-[#fbf9f6]">
+        <PageViewTracker />
         {children}
       </body>
     </html>
