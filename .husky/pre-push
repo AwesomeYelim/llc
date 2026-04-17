@@ -1,0 +1,2 @@
+#!/bin/sh
+~/.nvm/versions/node/v22.13.0/bin/node ~/.nvm/versions/node/v22.13.0/bin/npx tsc --noEmit
