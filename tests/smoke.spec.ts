@@ -103,12 +103,11 @@ test.describe('Regression tests', () => {
 
   // Bug #2 regression: PageViewTracker fires on navigation
   test('page view tracker fires API call', async ({ page }) => {
-    const requests: string[] = []
-    page.on('request', req => {
-      if (req.url().includes('/api/page-views')) requests.push(req.url())
-    })
+    const requestPromise = page.waitForRequest(
+      req => req.url().includes('/api/page-views'),
+      { timeout: 10000 }
+    )
     await page.goto('/')
-    await page.waitForTimeout(1000)
-    expect(requests.length).toBeGreaterThan(0)
+    await requestPromise // throws if no request within 10s
   })
 })
