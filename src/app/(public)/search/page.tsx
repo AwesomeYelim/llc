@@ -22,6 +22,7 @@ async function search(q: string): Promise<SearchResult> {
   const [sermons, columns, praise] = await Promise.all([
     prisma.sermon.findMany({
       where: {
+        youtubeId: { not: null },
         OR: [
           { title: { contains: q, mode: "insensitive" } },
           { scripture: { contains: q, mode: "insensitive" } },
