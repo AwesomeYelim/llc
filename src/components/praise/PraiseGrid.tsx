@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { DownloadButton } from "@/components/DownloadButton"
 import { QRButton } from "@/components/ui/QRButton"
 import { formatDate } from "@/lib/utils"
@@ -20,10 +20,13 @@ interface ContiItem {
 
 type FilterType = "all" | "key" | "theme" | "season"
 
+const PAGE_SIZE = 12
+
 export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [filterType, setFilterType] = useState<FilterType>("all")
   const [selectedValue, setSelectedValue] = useState<string>("")
   const [search, setSearch] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Extract unique values for each filter type
   const filterOptions = useMemo(() => {
@@ -83,6 +86,12 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
 
     return result
   }, [contis, search, filterType, selectedValue])
+
+  // Reset to page 1 when filter changes
+  useEffect(() => { setCurrentPage(1) }, [search, filterType, selectedValue])
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const filterTabs: { type: FilterType; label: string; icon: string }[] = [
     { type: "all", label: "전체", icon: "apps" },
@@ -191,7 +200,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((conti) => (
+                {paginated.map((conti) => (
                   <tr key={conti.id} className="group hover:bg-white/50 transition-all duration-300">
                     <td className="px-6 lg:px-8 py-8 bg-white first:rounded-l-xl">
                       <div className="font-serif text-xl lg:text-2xl font-bold text-[#022448]">
@@ -265,6 +274,29 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-8">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
+          >
+            이전
+          </button>
+          <span className="text-sm text-[#74777f]">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
+          >
+            다음
+          </button>
+        </div>
+      )}
     </div>
   )
 }

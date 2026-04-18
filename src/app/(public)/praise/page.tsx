@@ -2,9 +2,6 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { PraiseGrid } from "@/components/praise/PraiseGrid"
-import { PaginationLink } from "@/components/ui/PaginationLink"
-
-const PAGE_SIZE = 12
 
 export const metadata: Metadata = generatePageMetadata(
   "찬양 콘티 & 가사 PPT",
@@ -12,25 +9,15 @@ export const metadata: Metadata = generatePageMetadata(
   "/praise"
 )
 
-export default async function PraisePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>
-}) {
-  const { page: pageStr } = await searchParams
-  const page = Math.max(1, parseInt(pageStr || "1", 10))
-
+export default async function PraisePage() {
   const [contis, total, totalDownloadsResult] = await Promise.all([
     prisma.praiseConti.findMany({
       orderBy: { serviceDate: "desc" },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
     }),
     prisma.praiseConti.count(),
     prisma.praiseConti.aggregate({ _sum: { downloadCount: true } }),
   ])
 
-  const totalPages = Math.ceil(total / PAGE_SIZE)
   const totalDownloads = totalDownloadsResult._sum.downloadCount || 0
 
   // Serialize for client component
@@ -94,7 +81,6 @@ export default async function PraisePage({
       {/* Filterable Grid */}
       <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
         <PraiseGrid contis={serialized} />
-        <PaginationLink currentPage={page} totalPages={totalPages} basePath="/praise" />
       </section>
     </div>
   )
