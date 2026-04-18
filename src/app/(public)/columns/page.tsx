@@ -2,9 +2,6 @@ import { Metadata } from "next"
 import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { ColumnsGrid } from "@/components/columns/ColumnsGrid"
-import { PaginationLink } from "@/components/ui/PaginationLink"
-
-const PAGE_SIZE = 12
 
 export const metadata: Metadata = generatePageMetadata(
   "설교 칼럼",
@@ -12,25 +9,11 @@ export const metadata: Metadata = generatePageMetadata(
   "/columns"
 )
 
-export default async function ColumnsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>
-}) {
-  const { page: pageStr } = await searchParams
-  const page = Math.max(1, parseInt(pageStr || "1", 10))
-
-  const [columns, total] = await Promise.all([
-    prisma.column.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { sermon: { select: { sermonDate: true } } },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-    }),
-    prisma.column.count(),
-  ])
-
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+export default async function ColumnsPage() {
+  const columns = await prisma.column.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { sermon: { select: { sermonDate: true } } },
+  })
 
   // Strip HTML and serialize for client component
   const serialized = columns.map((col) => ({
@@ -64,10 +47,6 @@ export default async function ColumnsPage({
       </header>
 
       <ColumnsGrid columns={serialized} />
-
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
-        <PaginationLink currentPage={page} totalPages={totalPages} basePath="/columns" />
-      </div>
     </div>
   )
 }

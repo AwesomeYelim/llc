@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
 import { formatDate } from "@/lib/utils"
 
@@ -27,9 +27,12 @@ function getDate(col: ColumnItem) {
   return new Date(col.sermonDate || col.createdAt).getTime()
 }
 
+const PAGE_SIZE = 12
+
 export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<SortKey>("latest")
+  const [currentPage, setCurrentPage] = useState(1)
 
   const filtered = useMemo(() => {
     let result = [...columns]
@@ -61,6 +64,11 @@ export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
 
     return result
   }, [columns, search, sort])
+
+  useEffect(() => { setCurrentPage(1) }, [search, sort])
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   return (
     <>
@@ -124,7 +132,7 @@ export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
       {filtered.length > 0 ? (
         <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((col) => (
+            {paginated.map((col) => (
               <Link
                 key={col.id}
                 href={`/columns/${col.id}`}
@@ -159,6 +167,27 @@ export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
               </Link>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="col-span-full flex justify-center items-center gap-2 mt-4">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              >
+                이전
+              </button>
+              <span className="text-sm text-[#74777f]">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              >
+                다음
+              </button>
+            </div>
+          )}
         </section>
       ) : (
         <div className="text-center py-24 max-w-screen-2xl mx-auto px-6 lg:px-12">
