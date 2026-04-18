@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.dongnam.sync-keynote</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/hongyelim/.nvm/versions/node/v22.13.0/bin/node</string>
+    <string>/Users/hongyelim/llc/scripts/sync-keynote.mjs</string>
+  </array>
+
+  <!-- iCloud Keynote 폴더 변경 감지 시 자동 실행 -->
+  <key>WatchPaths</key>
+  <array>
+    <string>/Users/hongyelim/Library/Mobile Documents/com~apple~Keynote/Documents/콘티&amp; 악보</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/hongyelim/llc</string>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/sync-keynote.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/sync-keynote-error.log</string>
+
+  <!-- 연속 실행 방지: 60초 쿨다운 -->
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+</dict>
+</plist>
