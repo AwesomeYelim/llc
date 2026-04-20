@@ -17,7 +17,7 @@ export function Hero() {
           src="/images/hero_bg.jpg"
           alt="동남 생명의 빛 교회 예배당"
           fill
-          className="object-cover object-[center_70%]"
+          className="object-cover object-[center_85%]"
           priority
         />
         {/* 상단(아파트) 강하게 어둡게, 교회 건물·간판 부분은 살림 */}

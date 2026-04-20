@@ -79,8 +79,17 @@ export function Navbar() {
                 alt="동남 생명의 빛 교회"
                 fill
                 className={cn(
-                  "object-contain transition-opacity duration-300",
+                  "object-contain transition-opacity duration-300 absolute",
                   showDark ? "opacity-100" : "opacity-0"
+                )}
+              />
+              <Image
+                src="/images/logo_white.png"
+                alt="동남 생명의 빛 교회"
+                fill
+                className={cn(
+                  "object-contain transition-opacity duration-300 absolute",
+                  showDark ? "opacity-0" : "opacity-100"
                 )}
               />
             </div>
