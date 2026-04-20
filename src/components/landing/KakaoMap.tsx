@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 export function KakaoMap({ address }: { address: string }) {
   // 교회명으로 검색하면 네이버 지도에서 정확한 위치 핀이 찍힘
   // 네이버 지도에 등록된 정식 명칭으로 검색해야 교회 핀이 정확히 표시됨
-  const naverMapUrl = `https://map.naver.com/p/search/${encodeURIComponent(address)}?c=17.00,0,0,0,dh`
+  const naverMapUrl = `https://map.naver.com/p/search/${encodeURIComponent("동남 생명의빛교회")}?c=17.00,0,0,0,dh`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
@@ -46,7 +46,7 @@ export function KakaoMap({ address }: { address: string }) {
                   <p className="text-[#43474e] text-sm leading-relaxed">
                     {address}
                     <br />
-                    생명의 빛 교회
+                    동남 생명의 빛 교회
                   </p>
                 </div>
               </div>
@@ -67,7 +67,7 @@ export function KakaoMap({ address }: { address: string }) {
               </div>
             </div>
             <a
-              href={`https://map.naver.com/p/search/${encodeURIComponent(address)}`}
+              href={`https://map.naver.com/p/search/${encodeURIComponent("동남 생명의빛교회")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-[#022448] font-bold hover:text-[#795900] transition-colors mt-8 text-sm"
