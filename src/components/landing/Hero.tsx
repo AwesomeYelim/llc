@@ -17,10 +17,30 @@ export function Hero() {
           src="/images/hero_bg.jpg"
           alt="동남 생명의 빛 교회 예배당"
           fill
-          className="object-cover"
+          className="object-cover object-[center_70%]"
           priority
         />
-        <div className="absolute inset-0 editorial-gradient opacity-60" />
+        {/* 상단(아파트) 강하게 어둡게, 교회 건물·간판 부분은 살림 */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(to bottom,
+                rgba(0,0,0,0.82) 0%,
+                rgba(0,0,0,0.45) 38%,
+                rgba(0,0,0,0.18) 58%,
+                rgba(0,0,0,0.52) 100%
+              )
+            `,
+          }}
+        />
+        {/* 텍스트 가독성용 좌측 페이드 */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 60%)`,
+          }}
+        />
       </motion.div>
 
       <motion.div style={{ y: textY }} className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
