@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { google } from "googleapis"
 import { put } from "@vercel/blob"
 import prisma from "@/lib/prisma"
@@ -154,7 +155,10 @@ async function syncDrive() {
       synced++
     }
 
-    if (synced > 0) notifyIndexNow(["/praise"])
+    if (synced > 0) {
+      notifyIndexNow(["/praise"])
+      revalidatePath("/praise")
+    }
 
     return NextResponse.json({
       success: true,
