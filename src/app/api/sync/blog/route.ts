@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -188,7 +189,11 @@ async function syncBlog() {
     synced++
   }
 
-  if (newPaths.length > 0) notifyIndexNow(newPaths)
+  if (newPaths.length > 0) {
+    notifyIndexNow(newPaths)
+    revalidatePath("/columns")
+    revalidatePath("/sermons")
+  }
 
   return { success: true, synced, skipped, total: sermonPosts.length }
 }
