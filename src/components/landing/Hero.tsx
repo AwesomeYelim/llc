@@ -20,80 +20,56 @@ export function Hero() {
           className="object-cover object-center"
           priority
         />
-        {/* 하단 및 상단 살짝 어둡게, 교회 건물·간판 중앙부는 살림 */}
+        {/* 하단만 어둡게, 사진 본체는 최대한 살림 */}
         <div
           className="absolute inset-0"
           style={{
-            background: `
-              linear-gradient(to bottom,
-                rgba(0,0,0,0.30) 0%,
-                rgba(0,0,0,0.05) 35%,
-                rgba(0,0,0,0.05) 65%,
-                rgba(0,0,0,0.55) 100%
-              )
-            `,
-          }}
-        />
-        {/* 텍스트 가독성용 우측 페이드 (간판이 왼쪽에 있으므로 오른쪽에서 어둡게) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 55%)`,
+            background: `linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.60) 100%)`,
           }}
         />
       </motion.div>
 
-      <motion.div style={{ y: textY }} className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full flex justify-end">
-        <div className="max-w-xl text-right">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4"
-          >
-            동남 생명의 빛 교회
-          </motion.h1>
+      {/* 하단 텍스트 영역 */}
+      <motion.div
+        style={{ y: textY }}
+        className="absolute bottom-16 left-0 right-0 z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
+        >
+          {/* 교회명 + 태그라인 */}
+          <div>
+            <p className="text-white/60 text-xs tracking-widest uppercase mb-1">Dongnam Church of Light</p>
+            <h1 className="font-serif text-xl md:text-2xl font-bold text-white leading-tight">
+              동남 생명의 빛 교회
+            </h1>
+            <p className="text-[#f6be39] text-sm mt-1">&ldquo;하나님의 일을 성공시켜라&rdquo;</p>
+          </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-[#f6be39] text-lg md:text-2xl font-semibold mb-6"
-          >
-            &ldquo;하나님의 일을 성공시켜라&rdquo;
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="text-white/70 text-base md:text-lg mb-10 max-w-lg leading-relaxed"
-          >
-            이름을 불러주는 따뜻한 교회.
-            <br />
-            충북 청주시 상당구 중고개로125번길 29 · 담임목사 홍은익
-          </motion.p>
-
+          {/* 버튼 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.0 }}
-            className="flex flex-wrap gap-4 justify-end"
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="flex gap-3"
           >
             <Link
               href="/about"
-              className="bg-[#795900] text-white px-10 py-4 rounded-xl font-bold hover:brightness-110 transition-all"
+              className="bg-[#795900] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:brightness-110 transition-all"
             >
               교회 소개
             </Link>
             <Link
               href="/sermons"
-              className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-10 py-4 rounded-xl font-bold hover:bg-white/20 transition-all"
+              className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-white/20 transition-all"
             >
               설교 영상
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* Scroll indicator */}
