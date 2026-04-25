@@ -6,6 +6,7 @@ import Link from "next/link"
 import { formatDateShort } from "@/lib/utils"
 import { DeleteButton } from "@/components/admin/DeleteButton"
 import { Badge } from "@/components/ui/Badge"
+import { BulletinSyncButton } from "@/components/admin/BulletinSyncButton"
 
 export default async function AdminBulletinsPage() {
   const session = await auth()
@@ -20,12 +21,15 @@ export default async function AdminBulletinsPage() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">주보/PPT 관리</h1>
-        <Link
-          href="/admin/bulletins/new"
-          className="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg text-sm hover:bg-[#2a4a73]"
-        >
-          + 업로드
-        </Link>
+        <div className="flex items-center gap-2">
+          <BulletinSyncButton />
+          <Link
+            href="/admin/bulletins/new"
+            className="px-4 py-2 bg-[#1e3a5f] text-white rounded-lg text-sm hover:bg-[#2a4a73]"
+          >
+            + 업로드
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
