@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
+import { Pagination } from "@/components/ui/Pagination"
 import { formatDate } from "@/lib/utils"
 
 interface ColumnItem {
@@ -167,27 +168,11 @@ export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
               </Link>
             ))}
           </div>
-          {totalPages > 1 && (
-            <div className="col-span-full flex justify-center items-center gap-2 mt-4">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-              >
-                이전
-              </button>
-              <span className="text-sm text-[#74777f]">
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-              >
-                다음
-              </button>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </section>
       ) : (
         <div className="text-center py-24 max-w-screen-2xl mx-auto px-6 lg:px-12">

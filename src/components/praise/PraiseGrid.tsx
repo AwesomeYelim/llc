@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { DownloadButton } from "@/components/DownloadButton"
 import { QRButton } from "@/components/ui/QRButton"
+import { Pagination } from "@/components/ui/Pagination"
 import { formatDate } from "@/lib/utils"
 
 interface ContiItem {
@@ -18,7 +19,8 @@ interface ContiItem {
   season: string | null
 }
 
-type FilterType = "all" | "key" | "theme" | "season"
+type FilterType = "all" | "key" | "theme"
+type SortKey = "latest" | "title"
 
 const PAGE_SIZE = 12
 
@@ -26,38 +28,33 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [filterType, setFilterType] = useState<FilterType>("all")
   const [selectedValue, setSelectedValue] = useState<string>("")
   const [search, setSearch] = useState("")
+  const [sort, setSort] = useState<SortKey>("latest")
   const [currentPage, setCurrentPage] = useState(1)
 
   // Extract unique values for each filter type
   const filterOptions = useMemo(() => {
     const keys = new Set<string>()
     const themes = new Set<string>()
-    const seasons = new Set<string>()
 
     contis.forEach((c) => {
       if (c.musicalKey) {
-        // Split comma-separated keys (e.g., "C,G")
         c.musicalKey.split(",").forEach((k) => keys.add(k.trim()))
       }
       if (c.theme) {
-        // Split comma-separated themes
         c.theme.split(",").forEach((t) => themes.add(t.trim()))
       }
-      if (c.season) seasons.add(c.season)
     })
 
     return {
       key: Array.from(keys).sort(),
       theme: Array.from(themes).sort(),
-      season: Array.from(seasons).sort(),
     }
   }, [contis])
 
-  // Filter contis
+  // Filter + sort
   const filtered = useMemo(() => {
     let result = [...contis]
 
-    // Search filter
     if (search) {
       const q = search.toLowerCase()
       result = result.filter(
@@ -68,7 +65,6 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
       )
     }
 
-    // Category filter
     if (selectedValue && filterType !== "all") {
       result = result.filter((c) => {
         switch (filterType) {
@@ -76,19 +72,26 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
             return c.musicalKey?.split(",").some((k) => k.trim() === selectedValue)
           case "theme":
             return c.theme?.split(",").some((t) => t.trim() === selectedValue)
-          case "season":
-            return c.season === selectedValue
           default:
             return true
         }
       })
     }
 
-    return result
-  }, [contis, search, filterType, selectedValue])
+    switch (sort) {
+      case "latest":
+        result.sort((a, b) => new Date(b.serviceDate).getTime() - new Date(a.serviceDate).getTime())
+        break
+      case "title":
+        result.sort((a, b) => a.title.localeCompare(b.title, "ko"))
+        break
+    }
 
-  // Reset to page 1 when filter changes
-  useEffect(() => { setCurrentPage(1) }, [search, filterType, selectedValue])
+    return result
+  }, [contis, search, filterType, selectedValue, sort])
+
+  // Reset to page 1 when filter/sort changes
+  useEffect(() => { setCurrentPage(1) }, [search, filterType, selectedValue, sort])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -97,7 +100,11 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
     { type: "all", label: "전체", icon: "apps" },
     { type: "key", label: "코드별", icon: "music_note" },
     { type: "theme", label: "메세지별", icon: "bookmark" },
-    { type: "season", label: "절기별", icon: "calendar_month" },
+  ]
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "latest", label: "최신순" },
+    { key: "title", label: "제목순" },
   ]
 
   return (
@@ -118,25 +125,47 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
           />
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2">
-          {filterTabs.map((tab) => (
-            <button
-              key={tab.type}
-              onClick={() => {
-                setFilterType(tab.type)
-                setSelectedValue("")
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors ${
-                filterType === tab.type
-                  ? "bg-[#022448] text-white"
-                  : "bg-[#f5f3f0] text-[#43474e] hover:bg-[#e8e6e3]"
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
+        {/* Filter Tabs + Sort */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.type}
+                onClick={() => {
+                  setFilterType(tab.type)
+                  setSelectedValue("")
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors ${
+                  filterType === tab.type
+                    ? "bg-[#022448] text-white"
+                    : "bg-[#f5f3f0] text-[#43474e] hover:bg-[#e8e6e3]"
+                }`}
+              >
+                <span className="material-symbols-outlined text-base">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-[#74777f]">정렬</span>
+            <div className="flex bg-white border border-gray-200 rounded-lg overflow-hidden">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.key}
+                  onClick={() => setSort(opt.key)}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    sort === opt.key
+                      ? "bg-[#022448] text-white"
+                      : "text-[#43474e] hover:bg-[#f5f3f0]"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Sub-filters (tags) */}
@@ -240,10 +269,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl text-right">
                       <div className="flex justify-end gap-2 flex-wrap">
-                        <QRButton
-                          url={conti.fileUrl}
-                          title={conti.title}
-                        />
+                        <QRButton url={conti.fileUrl} title={conti.title} />
                         <a
                           href={`/api/praise/${conti.id}?view=1`}
                           target="_blank"
@@ -275,28 +301,11 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-8">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-          >
-            이전
-          </button>
-          <span className="text-sm text-[#74777f]">
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-lg text-sm border border-gray-200 bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-          >
-            다음
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   )
 }
