@@ -6,15 +6,20 @@ export function ShareButtons({ title }: { title: string }) {
   const [copied, setCopied] = useState(false)
   const [kakaoFallback, setKakaoFallback] = useState(false)
 
+  const isMobile = () =>
+    typeof navigator !== "undefined" &&
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
   const handleKakaoShare = async () => {
-    if (typeof navigator !== "undefined" && navigator.share) {
+    if (isMobile() && navigator.share) {
+      // 모바일: 기기 공유 시트 (KakaoTalk 포함)
       try {
         await navigator.share({ title, url: window.location.href })
       } catch {
         // AbortError: 사용자 취소 — 무시
       }
     } else {
-      // 데스크톱 폴백: 클립보드 복사
+      // 데스크톱: 링크 복사
       await navigator.clipboard.writeText(window.location.href)
       setKakaoFallback(true)
       setTimeout(() => setKakaoFallback(false), 2000)
