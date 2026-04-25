@@ -14,37 +14,37 @@ export function Hero() {
       {/* Background photo with parallax */}
       <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>
         <Image
-          src="/images/hero_bg.jpg"
+          src="/images/hero_bg2.png"
           alt="동남 생명의 빛 교회 예배당"
           fill
-          className="object-cover object-[center_85%]"
+          className="object-cover object-center"
           priority
         />
-        {/* 상단(아파트) 강하게 어둡게, 교회 건물·간판 부분은 살림 */}
+        {/* 하단 및 상단 살짝 어둡게, 교회 건물·간판 중앙부는 살림 */}
         <div
           className="absolute inset-0"
           style={{
             background: `
               linear-gradient(to bottom,
-                rgba(0,0,0,0.82) 0%,
-                rgba(0,0,0,0.45) 38%,
-                rgba(0,0,0,0.18) 58%,
-                rgba(0,0,0,0.52) 100%
+                rgba(0,0,0,0.30) 0%,
+                rgba(0,0,0,0.05) 35%,
+                rgba(0,0,0,0.05) 65%,
+                rgba(0,0,0,0.55) 100%
               )
             `,
           }}
         />
-        {/* 텍스트 가독성용 좌측 페이드 */}
+        {/* 텍스트 가독성용 우측 페이드 (간판이 왼쪽에 있으므로 오른쪽에서 어둡게) */}
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 60%)`,
+            background: `linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 55%)`,
           }}
         />
       </motion.div>
 
-      <motion.div style={{ y: textY }} className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full">
-        <div className="max-w-2xl">
+      <motion.div style={{ y: textY }} className="relative z-10 px-6 lg:px-12 max-w-screen-2xl mx-auto w-full flex justify-end">
+        <div className="max-w-xl text-right">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-wrap gap-4 justify-end"
           >
             <Link
               href="/about"
