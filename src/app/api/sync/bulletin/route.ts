@@ -63,9 +63,9 @@ export async function POST() {
 
 async function syncBulletin() {
   try {
-    const folderId = process.env.GOOGLE_DRIVE_BULLETIN_FOLDER_ID
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID
     if (!folderId) {
-      return NextResponse.json({ success: false, error: "GOOGLE_DRIVE_BULLETIN_FOLDER_ID not set" })
+      return NextResponse.json({ success: false, error: "GOOGLE_DRIVE_FOLDER_ID not set" })
     }
 
     const drive = getDriveClient()
