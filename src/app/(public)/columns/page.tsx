@@ -19,7 +19,11 @@ export default async function ColumnsPage() {
   const serialized = columns.map((col) => ({
     id: col.id,
     title: col.title,
-    content: col.content.replace(/<[^>]*>/g, ""),
+    content: col.content
+      .replace(/<\/?(p|br|div|li|h[1-6])[^>]*>/gi, " ")
+      .replace(/<[^>]*>/g, "")
+      .replace(/\s+/g, " ")
+      .trim(),
     scripture: col.scripture,
     viewCount: col.viewCount,
     createdAt: col.createdAt.toISOString(),

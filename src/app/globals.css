@@ -94,8 +94,10 @@ html {
 /* Column content styles */
 .column-content {
   font-family: var(--font-serif);
-  line-height: 1.9;
+  line-height: 2.1;
   color: #1b1c1a;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .column-content-first p:first-of-type::first-letter {
@@ -133,7 +135,7 @@ html {
 }
 
 .column-content p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.6rem;
 }
 
 .column-content .bible-verse {

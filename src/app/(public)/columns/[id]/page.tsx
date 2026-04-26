@@ -7,6 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ShareButtons } from "@/components/ShareButtons"
 import { ViewTracker } from "@/components/columns/ViewTracker"
+import { ReadingProgress } from "@/components/columns/ReadingProgress"
 import { generatePageMetadata, columnJsonLd } from "@/lib/seo"
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs"
 
@@ -97,6 +98,7 @@ export default async function ColumnDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(columnJsonLd(column)) }}
       />
+      <ReadingProgress />
       <ViewTracker id={column.id} />
       <div className="max-w-screen-xl mx-auto px-6 lg:px-12 pt-4">
         <Breadcrumbs
@@ -106,11 +108,12 @@ export default async function ColumnDetailPage({ params }: Props) {
           ]}
         />
       </div>
-      {/* Hero Section - Magazine Style */}
-      <header className="relative">
-        {/* Hero Image */}
-        <div className="relative h-[50vh] min-h-[400px] lg:h-[60vh] overflow-hidden">
-          {column.coverImageUrl ? (
+
+      {/* Hero Section */}
+      <header>
+        {column.coverImageUrl ? (
+          /* 커버 이미지 있을 때 — 매거진 스타일 */
+          <div className="relative h-[50vh] min-h-[400px] lg:h-[60vh] overflow-hidden">
             <Image
               src={column.coverImageUrl}
               alt={column.title}
@@ -119,54 +122,54 @@ export default async function ColumnDetailPage({ params }: Props) {
               className="object-cover"
               priority
             />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#022448] via-[#1e3a5f] to-[#0a3060]">
-              {/* Decorative pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[#795900] blur-[120px]" />
-                <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-[#ffdfa0] blur-[100px]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+            <div className="absolute inset-0 flex items-end">
+              <div className="max-w-screen-xl mx-auto w-full px-6 lg:px-12 pb-12 lg:pb-16">
+                <span className="inline-block bg-[#795900] text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
+                  말씀 칼럼
+                </span>
+                <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] max-w-4xl break-keep">
+                  {column.title}
+                </h1>
               </div>
             </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-
-          {/* Title on Hero */}
-          <div className="absolute inset-0 flex items-end">
-            <div className="max-w-screen-xl mx-auto w-full px-6 lg:px-12 pb-12 lg:pb-16">
-              <span className="inline-block bg-[#795900] text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
-                말씀 칼럼
-              </span>
-              <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] max-w-4xl">
-                {column.title}
-              </h1>
-            </div>
           </div>
-        </div>
+        ) : (
+          /* 커버 이미지 없을 때 — 에디토리얼 헤더 */
+          <div className="max-w-screen-xl mx-auto px-6 lg:px-12 pt-10 pb-10 lg:pt-14 lg:pb-12">
+            <span className="inline-block bg-[#795900] text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
+              말씀 칼럼
+            </span>
+            <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold text-[#022448] leading-[1.2] max-w-4xl break-keep">
+              {column.title}
+            </h1>
+          </div>
+        )}
 
         {/* Meta bar */}
         <div className="bg-[#f5f3f0] border-b border-[#e4e2df]">
-          <div className="max-w-screen-xl mx-auto px-6 lg:px-12 py-5 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-6 text-sm">
+          <div className="max-w-screen-xl mx-auto px-6 lg:px-12 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#022448] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-full bg-[#022448] flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[#ffdfa0] text-lg">person</span>
                 </div>
                 <div>
                   <span className="font-bold text-[#022448]">홍은익 담임목사</span>
-                  <span className="text-[#43474e] ml-3">
+                  <span className="text-[#43474e] ml-2 text-xs">
                     {formatDate(column.sermon?.sermonDate || column.createdAt)}
                   </span>
                 </div>
               </div>
               {column.scripture && (
-                <span className="hidden sm:flex items-center gap-1 text-[#795900] font-semibold">
+                <span className="flex items-center gap-1 text-[#795900] font-semibold text-sm">
                   <span className="material-symbols-outlined text-base">menu_book</span>
                   {column.scripture}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#43474e] mr-2">
+              <span className="text-xs text-[#43474e]">
                 {Math.ceil(plainText.length / 500)}분 읽기
               </span>
               <ShareButtons title={column.title} />
