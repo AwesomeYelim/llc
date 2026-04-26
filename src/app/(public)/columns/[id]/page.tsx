@@ -65,6 +65,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   )
 }
 
+/**
+ * 성경 인용/숫자 패턴에 하이라이트 span을 추가하는 HTML 후처리기
+ * - bible-verse 절 번호: 8:31 → <span class="verse-num">8:31</span>
+ * - 괄호 인용: (마 5:38) → <span class="verse-ref">(마 5:38)</span>
+ * - 대괄호 인용: [요10:27] → <span class="verse-ref">[요10:27]</span>
+ * - 원문자: ①②③ → <span class="step-num">①</span>
+ * - 빈 단락(ZWS) 제거
+ */
+function processColumnContent(html: string): string {
+  return html
+    // 빈 단락(zero-width space, 공백) 제거
+    .replace(/<p>[\u200B\s]*<\/p>/g, "")
+    // bible-verse 절 번호 강조 (예: 8:31)
+    .replace(
+      /<p class="bible-verse">(\d+:\d+)\s*/g,
+      '<p class="bible-verse"><span class="verse-num">$1</span> '
+    )
+    // 괄호 성경 인용: (마 5:38), (골 2:6, 개정) 등
+    .replace(
+      /\(([가-힣]{1,4}[\s]?\d+:\d+[^)]{0,20})\)/g,
+      '<span class="verse-ref">($1)</span>'
+    )
+    // 대괄호 성경 인용: [요10:27], [고전14:1] 등
+    .replace(
+      /\[([가-힣]{0,4}\d+:\d+[^\]]{0,20})\]/g,
+      '<span class="verse-ref">[$1]</span>'
+    )
+    // 원문자 ①-⑳ 하이라이트
+    .replace(/([①-⑳⓵-⓾])/g, '<span class="step-num">$1</span>')
+}
+
 /** 본문에서 첫 번째 의미 있는 문장 추출 (pull quote용) */
 function extractPullQuote(html: string): string {
   const text = html.replace(/<[^>]*>/g, "").trim()
@@ -83,13 +114,14 @@ export default async function ColumnDetailPage({ params }: Props) {
 
   const recentColumns = await getRecentColumns(column.id)
 
+  const processedContent = processColumnContent(column.content)
   const plainText = column.content.replace(/<[^>]*>/g, "")
   const pullQuote = extractPullQuote(column.content)
 
   // 본문을 앞/뒤로 분할 (pull quote 삽입 위치)
-  const paragraphs = column.content.split("</p>")
+  const paragraphs = processedContent.split("</p>")
   const splitAt = Math.min(Math.floor(paragraphs.length * 0.3), 15)
-  const contentBefore = paragraphs.slice(0, splitAt).join("</p>") + "</p>"
+  const contentBefore = paragraphs.slice(0, splitAt).join("</p>") + (splitAt < paragraphs.length ? "</p>" : "")
   const contentAfter = paragraphs.slice(splitAt).join("</p>")
 
   return (

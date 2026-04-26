@@ -140,12 +140,64 @@ html {
 
 .column-content .bible-verse {
   border-left: 3px solid #795900;
-  padding: 0.5rem 1rem;
-  margin: 0.3rem 0;
-  background: rgba(121, 89, 0, 0.04);
-  font-size: 0.95rem;
-  color: #43474e;
-  line-height: 1.7;
+  padding: 0.55rem 1rem 0.55rem 1rem;
+  margin-bottom: 2px;     /* 연속 블록 사이 최소 간격 */
+  background: rgba(121, 89, 0, 0.05);
+  font-size: 0.93rem;
+  color: #3d3d3d;
+  line-height: 1.8;
+}
+
+/* 비-bible-verse 단락 다음에 오는 첫 bible-verse → 위 여백 */
+.column-content p:not(.bible-verse) + .bible-verse {
+  margin-top: 1.4rem;
+}
+
+/* bible-verse 그룹 마지막 블록 다음 단락 → 위 여백 */
+.column-content .bible-verse + p:not(.bible-verse) {
+  margin-top: 1rem;
+}
+
+/* 절 번호 뱃지 (8:31) */
+.verse-num {
+  display: inline-block;
+  background: #795900;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1em 0.45em;
+  border-radius: 3px;
+  margin-right: 0.35em;
+  vertical-align: middle;
+  font-family: var(--font-sans, sans-serif);
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+/* 괄호/대괄호 성경 인용 (마 5:38) */
+.verse-ref {
+  color: #795900;
+  font-weight: 600;
+  font-size: 0.88em;
+}
+
+/* 원문자 ①②③ */
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  background: #022448;
+  color: #ffdfa0;
+  border-radius: 50%;
+  font-size: 0.78em;
+  font-weight: 700;
+  margin-right: 0.15em;
+  vertical-align: middle;
+  font-family: var(--font-sans, sans-serif);
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 /* Tiptap Editor */
