@@ -143,15 +143,15 @@
 
 ## 4. 찬양 콘티 & 가사 PPT 관리
 
-찬양 콘티 및 가사 PPT 파일을 업로드하고 관리하는 메뉴입니다. Google Drive에서 자동 동기화되며, 업로드된 파일은 성도들이 공개 페이지에서 다운로드할 수 있습니다.
+찬양 콘티 및 가사 PPT 파일을 업로드하고 관리하는 메뉴입니다. Keynote Cloud에서 자동 동기화되며, 업로드된 파일은 성도들이 공개 페이지에서 다운로드할 수 있습니다.
 
-### Google Drive 자동 동기화
+### Keynote Cloud 자동 동기화
 
-찬양 콘티 파일은 Google Drive 폴더에서 자동으로 동기화됩니다.
+찬양 콘티 파일은 Keynote Cloud 폴더에서 자동으로 동기화됩니다.
 
-- **자동 실행**: 매일 오전 6시 (Vercel Cron)
-- **수동 실행**: 대시보드에서 **Google Drive 동기화** 버튼 클릭
-- **지원 형식**: `.key` (Keynote) 파일 -- PDF로 자동 변환됨
+- **자동 실행**: 매일 오전 9시 (macOS launchd)
+- **수동 실행**: 터미널에서 `node scripts/sync-keynote.mjs` 실행
+- **지원 형식**: `.key` (Keynote) 파일 -- PDF로 자동 변환됨 (AppleScript / Keynote Creator Studio)
 - **중복 방지**: 이미 등록된 파일은 건너뜁니다.
 
 ### 파일명 규칙과 자동 태그
@@ -461,16 +461,16 @@
 
 ---
 
-## 11. 자동 동기화 (YouTube / 네이버 블로그 / Google Drive)
+## 11. 자동 동기화 (YouTube / 네이버 블로그 / Keynote Cloud)
 
-교회 유튜브 채널의 설교 영상, 네이버 블로그의 설교 칼럼, Google Drive의 찬양 콘티가 매일 자동으로 동기화됩니다.
+교회 유튜브 채널의 설교 영상, 네이버 블로그의 설교 칼럼, Keynote Cloud의 찬양 콘티가 매일 자동으로 동기화됩니다.
 
 ### 자동 동기화 스케줄
 
-- **실행 시간**: 매일 오전 6시 (Vercel Cron)
+- **실행 시간**: 매일 오전 9시 (macOS launchd)
 - **YouTube 동기화**: 채널의 최신 영상을 자동으로 설교 목록에 추가
 - **블로그 동기화**: 네이버 블로그의 최신 글을 자동으로 설교 칼럼에 추가
-- **Google Drive 동기화**: 지정된 폴더의 찬양 콘티 파일을 자동으로 다운로드/업로드
+- **Keynote Cloud 동기화**: Keynote Cloud 폴더의 찬양 콘티 파일을 자동으로 동기화 및 PDF 변환
 
 ### 수동 동기화
 
@@ -478,13 +478,13 @@
 
 - **유튜브 동기화** -- YouTube 채널에서 최신 설교 영상 가져오기
 - **블로그 동기화** -- 네이버 블로그에서 최신 설교 칼럼 가져오기
-- **Google Drive 동기화** -- Google Drive에서 최신 찬양 콘티 가져오기
+- **찬양 콘티 동기화** -- 터미널에서 `node scripts/sync-keynote.mjs` 실행
 
 ### 참고 사항
 
 - 이미 등록된 영상/글/파일은 중복으로 추가되지 않습니다.
 - 동기화된 칼럼의 조회수는 0에서 시작하여 방문자가 열람할 때마다 증가합니다.
-- Google Drive의 `.key` 파일은 로컬 배치 스크립트(`scripts/sync-drive.mjs`)로 PDF 변환 가능합니다.
+- Keynote Cloud의 `.key` 파일은 `scripts/sync-keynote.mjs` 스크립트로 PDF 자동 변환됩니다 (AppleScript / Keynote Creator Studio).
 - 캐시(ISR)로 인해 동기화 후 최대 5분 내에 공개 페이지에 반영됩니다.
 
 ---

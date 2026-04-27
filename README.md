@@ -1,6 +1,6 @@
 # 동남생명의빛교회 홈페이지
 
-> **배포 URL**: [https://llc-beta.vercel.app](https://llc-beta.vercel.app)
+> **배포 URL**: [https://dongnam-llc.vercel.app](https://dongnam-llc.vercel.app)
 >
 > **GitHub**: [https://github.com/AwesomeYelim/llc](https://github.com/AwesomeYelim/llc)
 
@@ -20,7 +20,7 @@
 | **데이터베이스** | PostgreSQL |
 | **ORM** | Prisma 6 |
 | **인증** | Auth.js (next-auth) v5 beta |
-| **파일 저장소** | Vercel Blob |
+| **파일 저장소** | 자체 서버 (nginx, 138.2.119.220) |
 | **리치 텍스트 에디터** | Tiptap 3 |
 | **차트** | Recharts |
 | **QR 코드** | qrcode |
@@ -34,7 +34,7 @@
 - **Node.js** 20 이상
 - **npm** (Node.js에 포함)
 - **PostgreSQL** 데이터베이스 (로컬 또는 클라우드 -- Neon, Supabase, Railway 등)
-- **Vercel Blob** 스토리지 토큰 (파일 업로드용)
+- **파일 서버** SSH 접근 가능한 자체 서버 (138.2.119.220, SCP 업로드)
 
 ---
 
@@ -59,15 +59,11 @@ DATABASE_URL="postgresql://user:password@localhost:5432/dongnam_church"
 NEXTAUTH_SECRET="your-random-secret-key"
 NEXTAUTH_URL="http://localhost:3000"
 
-# Vercel Blob (파일 업로드)
-BLOB_READ_WRITE_TOKEN="vercel_blob_rw_xxxxxxxxxxxx"
-
-# Google Drive 동기화 (찬양 콘티)
-GOOGLE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'
-GOOGLE_DRIVE_FOLDER_ID="your-google-drive-folder-id"
-
-# Vercel Cron 인증
-CRON_SECRET="your-cron-secret"
+# 파일 서버 (선택적, 기본값 있음)
+FILE_SERVER_HOST="138.2.119.220"
+FILE_SERVER_USER="ubuntu"
+FILE_SERVER_ASSETS_DIR="/var/www/assets"
+FILE_SERVER_BASE_URL="http://138.2.119.220/assets/"
 ```
 
 | 변수 | 설명 |
@@ -75,10 +71,10 @@ CRON_SECRET="your-cron-secret"
 | `DATABASE_URL` | PostgreSQL 연결 문자열 |
 | `NEXTAUTH_SECRET` | Auth.js 세션 암호화에 사용되는 비밀 키. `openssl rand -base64 32`로 생성 가능 |
 | `NEXTAUTH_URL` | 사이트 기본 URL. 로컬 개발 시 `http://localhost:3000` |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob 읽기/쓰기 토큰. Vercel 대시보드에서 발급 |
-| `GOOGLE_SERVICE_ACCOUNT_KEY` | Google Drive 서비스 계정 JSON 키 (찬양 콘티 동기화용) |
-| `GOOGLE_DRIVE_FOLDER_ID` | 찬양 콘티가 저장된 Google Drive 폴더 ID |
-| `CRON_SECRET` | Vercel Cron 인증 토큰 |
+| `FILE_SERVER_HOST` | 파일 서버 호스트 (기본: `138.2.119.220`) |
+| `FILE_SERVER_USER` | 파일 서버 SSH 사용자 (기본: `ubuntu`) |
+| `FILE_SERVER_ASSETS_DIR` | 파일 서버 에셋 디렉토리 (기본: `/var/www/assets`) |
+| `FILE_SERVER_BASE_URL` | 파일 서버 기본 URL (기본: `http://138.2.119.220/assets/`) |
 
 ### 3. 의존성 설치
 
@@ -166,7 +162,7 @@ llc/
 │   │   │   ├── columns/       #   칼럼 API
 │   │   │   ├── gallery/       #   갤러리 API
 │   │   │   ├── settings/      #   사이트 설정 API
-│   │   │   ├── upload/        #   파일 업로드 (Vercel Blob)
+│   │   │   ├── upload/        #   파일 업로드 (자체 서버)
 │   │   │   ├── page-views/    #   페이지 조회수
 │   │   │   ├── events/        #   교회 일정 CRUD API
 │   │   │   ├── prayer/        #   기도 요청 API
@@ -261,19 +257,19 @@ llc/
    - `DATABASE_URL` -- PostgreSQL 연결 문자열 (Neon, Supabase 등)
    - `NEXTAUTH_SECRET` -- 세션 암호화 키
    - `NEXTAUTH_URL` -- 배포된 사이트 URL (예: `https://dongnam.church`)
-   - `BLOB_READ_WRITE_TOKEN` -- Vercel Blob 토큰 (Vercel Storage 탭에서 생성)
+   - `FILE_SERVER_HOST` / `FILE_SERVER_USER` / `FILE_SERVER_ASSETS_DIR` / `FILE_SERVER_BASE_URL` -- 파일 서버 설정 (기본값 있음)
 3. 배포 후 Vercel 콘솔이나 로컬에서 시드 데이터를 실행합니다:
    ```bash
    npx prisma db push
    npm run db:seed
    ```
 
-### Vercel Blob 설정
+### 파일 서버 설정 (138.2.119.220)
 
-파일 업로드(찬양 콘티 & 가사 PPT, 주보, 갤러리 이미지) 기능을 사용하려면 Vercel Blob 스토리지가 필요합니다:
+파일 업로드(찬양 콘티 & 가사 PPT, 주보, 갤러리 이미지) 기능을 사용하려면 자체 파일 서버가 필요합니다:
 
-1. Vercel 대시보드 > Storage 탭에서 Blob 스토어를 생성합니다.
-2. 생성된 `BLOB_READ_WRITE_TOKEN`을 환경 변수에 추가합니다.
+1. 파일 서버(138.2.119.220)에 SSH 키 인증으로 접근할 수 있어야 합니다.
+2. 파일은 SCP 방식으로 `/var/www/assets/`에 업로드되며, `http://138.2.119.220/assets/`로 제공됩니다.
 
 ---
 
@@ -282,13 +278,13 @@ llc/
 - **랜딩 페이지** -- 히어로 패럴렉스 배너, 비전 메시지, 예배 시간, 최근 설교, 카카오맵, 빠른 링크
 - **설교 관리** -- 설교 등록/수정/삭제, 유튜브 영상 연동, 시리즈 및 태그 분류
 - **설교 원고(칼럼)** -- 매거진 스타일 칼럼 상세 페이지, 검색/정렬(최신순·오래된순·조회순·제목순), 조회수 추적
-- **찬양 콘티 & 가사 PPT** -- Google Drive 자동 동기화, .key→PDF 변환, 코드별/메세지별/절기별 필터, 검색, 다운로드, QR 코드
+- **찬양 콘티 & 가사 PPT** -- Keynote Cloud 자동 동기화, .key→PDF 변환, 코드별/메세지별/절기별 필터, 검색, 다운로드, QR 코드
 - **주보 & 예배 PPT** -- 주보 및 예배 PPT 파일 업로드 및 다운로드, QR 코드
 - **갤러리** -- 교회 사진 업로드, 전체화면 라이트박스 (키보드 화살표 지원)
 - **교회 일정** -- CSS Grid 월간 캘린더, 이벤트 클릭 상세, 어드민 CRUD
 - **기도 요청** -- 익명/실명 기도 제목 제출, 응답된 기도 공개, 어드민 응답 처리
 - **통합 검색** -- 설교·칼럼·찬양 전체 검색 (`/search?q=`), Navbar 검색 아이콘
-- **자동 동기화** -- YouTube, 네이버 블로그, Google Drive 자동 수집 (Vercel Cron, 매일 오전 6시)
+- **자동 동기화** -- YouTube, 네이버 블로그, Keynote Cloud 자동 수집 (macOS launchd, 매일 오전 9시)
 - **사이트 설정** -- 교회 정보, 예배 시간, 유튜브/블로그 URL 등 동적 설정
 - **방문자 분석** -- 어드민 대시보드에서 최근 7일 방문자 차트(Recharts), 인기 페이지 순위
 - **SEO** -- 사이트맵, robots.txt, JSON-LD 구조화 데이터, Open Graph 메타태그
