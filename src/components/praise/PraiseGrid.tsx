@@ -31,18 +31,28 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [sort, setSort] = useState<SortKey>("latest")
   const [currentPage, setCurrentPage] = useState(1)
 
+  // musicalKey 파싱: "D,A:소망" → { keys: ["D","A"], theme: "소망" }
+  function parseKey(raw: string | null): { keys: string[]; theme: string | null } {
+    if (!raw) return { keys: [], theme: null }
+    const colonIdx = raw.indexOf(":")
+    if (colonIdx === -1) return { keys: raw.split(",").map((k) => k.trim()), theme: null }
+    return {
+      keys: raw.substring(0, colonIdx).split(",").map((k) => k.trim()),
+      theme: raw.substring(colonIdx + 1).trim() || null,
+    }
+  }
+
   // Extract unique values for each filter type
   const filterOptions = useMemo(() => {
     const keys = new Set<string>()
     const themes = new Set<string>()
 
     contis.forEach((c) => {
-      if (c.musicalKey) {
-        c.musicalKey.split(",").forEach((k) => keys.add(k.trim()))
-      }
-      if (c.theme) {
-        c.theme.split(",").forEach((t) => themes.add(t.trim()))
-      }
+      const parsed = parseKey(c.musicalKey)
+      parsed.keys.forEach((k) => { if (k) keys.add(k) })
+      if (parsed.theme) themes.add(parsed.theme)
+      // DB theme 필드도 반영
+      if (c.theme) c.theme.split(",").forEach((t) => { if (t.trim()) themes.add(t.trim()) })
     })
 
     return {
@@ -67,11 +77,15 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
 
     if (selectedValue && filterType !== "all") {
       result = result.filter((c) => {
+        const parsed = parseKey(c.musicalKey)
         switch (filterType) {
           case "key":
-            return c.musicalKey?.split(",").some((k) => k.trim() === selectedValue)
+            return parsed.keys.includes(selectedValue)
           case "theme":
-            return c.theme?.split(",").some((t) => t.trim() === selectedValue)
+            return (
+              parsed.theme === selectedValue ||
+              c.theme?.split(",").some((t) => t.trim() === selectedValue)
+            )
           default:
             return true
         }
@@ -247,21 +261,33 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
-                        {conti.musicalKey && (
-                          <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">
-                            {conti.musicalKey}
-                          </span>
-                        )}
-                        {conti.theme && (
-                          <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded-full">
-                            {conti.theme}
-                          </span>
-                        )}
-                        {conti.season && (
-                          <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded-full">
-                            {conti.season}
-                          </span>
-                        )}
+                        {(() => {
+                          const parsed = parseKey(conti.musicalKey)
+                          return (
+                            <>
+                              {parsed.keys.map((k) => (
+                                <span key={k} className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">
+                                  {k} key
+                                </span>
+                              ))}
+                              {parsed.theme && (
+                                <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded-full">
+                                  {parsed.theme}
+                                </span>
+                              )}
+                              {conti.theme && (
+                                <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded-full">
+                                  {conti.theme}
+                                </span>
+                              )}
+                              {conti.season && (
+                                <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded-full">
+                                  {conti.season}
+                                </span>
+                              )}
+                            </>
+                          )
+                        })()}
                       </div>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">

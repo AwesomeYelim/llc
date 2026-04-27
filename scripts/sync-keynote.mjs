@@ -90,7 +90,12 @@ async function main() {
     process.exit(1)
   }
 
-  const newFiles = files.filter((f) => !existingNames.has(basename(f, '.key') + '.pdf'))
+  const newFiles = files.filter((f) => {
+    // 제목 없는 기본 파일 (Presentation N) 스킵
+    const title = parseTitle(f)
+    if (/^Presentation\s*\d*$/i.test(title)) return false
+    return !existingNames.has(basename(f, '.key') + '.pdf')
+  })
 
   if (newFiles.length === 0) {
     console.log('새 파일 없음')
