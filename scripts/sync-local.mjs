@@ -1,9 +1,34 @@
 import 'dotenv/config';
-import { put, del, list } from '@vercel/blob';
 import { PrismaClient } from '@prisma/client';
-import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, unlinkSync } from 'fs';
+import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync } from 'fs';
 import { join, extname } from 'path';
 import { execSync } from 'child_process';
+
+// ──────────────────────────────────────────────
+// 파일 서버 설정
+// ──────────────────────────────────────────────
+const FILE_SERVER_HOST = process.env.FILE_SERVER_HOST || '138.2.119.220';
+const FILE_SERVER_USER = process.env.FILE_SERVER_USER || 'ubuntu';
+const FILE_SERVER_ASSETS_DIR = process.env.FILE_SERVER_ASSETS_DIR || '/var/www/assets';
+const FILE_SERVER_BASE_URL = process.env.FILE_SERVER_BASE_URL || `http://${FILE_SERVER_HOST}/assets`;
+
+function uploadToServer(localPath, remoteSubpath) {
+  const remotePath = `${FILE_SERVER_ASSETS_DIR}/${remoteSubpath}`;
+  execSync(
+    `scp -o StrictHostKeyChecking=no "${localPath}" ${FILE_SERVER_USER}@${FILE_SERVER_HOST}:"${remotePath}"`,
+    { timeout: 120000 }
+  );
+  return `${FILE_SERVER_BASE_URL}/${remoteSubpath}`;
+}
+
+function deleteFromServer(remoteSubpath) {
+  try {
+    execSync(
+      `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "rm -f '${FILE_SERVER_ASSETS_DIR}/${remoteSubpath}'"`,
+      { timeout: 30000 }
+    );
+  } catch {}
+}
 
 const prisma = new PrismaClient();
 const TEMP_DIR = '/tmp/sync-local';
@@ -68,7 +93,8 @@ function parseContiDate(folderName) {
 // 주보 폴더명 → 날짜 (YYYYMM_N → 해당 월 N번째 일요일)
 // ──────────────────────────────────────────────
 function parseBulletinDate(folderName) {
-  const m = folderName.match(/^(\d{4})(\d{2})_(\d+|.+)$/);
+  // sun_YYYYMM_N 또는 YYYYMM_N 둘 다 지원
+  const m = folderName.replace(/^sun_/i, '').match(/^(\d{4})(\d{2})_(\d+|.+)$/);
   if (!m) return null;
   const year = parseInt(m[1]);
   const month = parseInt(m[2]);
@@ -92,23 +118,44 @@ function parseBulletinDate(folderName) {
 async function cleanBulletins() {
   console.log('\n🧹 기존 주보 데이터 정리...');
 
-  // Blob에서 bulletins/ 프리픽스 파일 삭제
-  let cursor;
-  let deletedBlobs = 0;
-  do {
-    const result = await list({ prefix: 'bulletins/', cursor, limit: 100 });
-    if (result.blobs.length > 0) {
-      await del(result.blobs.map(b => b.url));
-      deletedBlobs += result.blobs.length;
-    }
-    cursor = result.hasMore ? result.cursor : undefined;
-  } while (cursor);
+  // 서버에서 bulletins/ 디렉토리 파일 삭제
+  try {
+    execSync(
+      `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "rm -f '${FILE_SERVER_ASSETS_DIR}/bulletins/'*.zip"`,
+      { timeout: 30000 }
+    );
+    console.log('  서버 bulletins/ 파일 삭제 완료');
+  } catch (e) {
+    console.log('  서버 파일 삭제 실패 (무시):', e.message);
+  }
 
   // DB 레코드 삭제 (BulletinFile → Bulletin 순서)
   const { count: fileCount } = await prisma.bulletinFile.deleteMany({});
   const { count: bulletinCount } = await prisma.bulletin.deleteMany({});
 
-  console.log(`  Blob: ${deletedBlobs}개 삭제, DB: ${bulletinCount}개 주보 + ${fileCount}개 파일 삭제`);
+  console.log(`  DB: ${bulletinCount}개 주보 + ${fileCount}개 파일 삭제`);
+}
+
+// ──────────────────────────────────────────────
+// 기존 콘티 데이터 정리
+// ──────────────────────────────────────────────
+async function cleanConti() {
+  console.log('\n🧹 기존 콘티 데이터 정리...');
+
+  // 서버에서 praise/ 디렉토리 전체 삭제 후 재생성
+  try {
+    execSync(
+      `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "rm -rf '${FILE_SERVER_ASSETS_DIR}/praise' && mkdir -p '${FILE_SERVER_ASSETS_DIR}/praise'"`,
+      { timeout: 30000 }
+    );
+    console.log('  서버 praise/ 디렉토리 초기화 완료');
+  } catch (e) {
+    console.log('  서버 파일 삭제 실패 (무시):', e.message);
+  }
+
+  // DB 레코드 삭제
+  const { count } = await prisma.praiseConti.deleteMany({});
+  console.log(`  DB: ${count}개 콘티 삭제`);
 }
 
 // ──────────────────────────────────────────────
@@ -121,8 +168,9 @@ async function syncConti() {
     return { synced: 0, skipped: 0 };
   }
 
-  const existing = await prisma.praiseConti.findMany({ select: { fileName: true } });
-  const existingNames = new Set(existing.map(e => e.fileName));
+  // 중복 체크는 (serviceDate + fileName) 복합키로 — 같은 곡이 여러 날짜에 사용 가능
+  const existing = await prisma.praiseConti.findMany({ select: { serviceDate: true, fileName: true } });
+  const existingKeys = new Set(existing.map(e => `${e.serviceDate.toISOString()}|${e.fileName}`));
 
   const folders = readdirSync(CONTI_DIR).filter(f => {
     const full = join(CONTI_DIR, f);
@@ -141,14 +189,14 @@ async function syncConti() {
     ).sort();
 
     for (const file of files) {
-      if (existingNames.has(file)) {
+      const compositeKey = `${serviceDate.toISOString()}|${file}`;
+      if (existingKeys.has(compositeKey)) {
         skipped++;
         continue;
       }
 
       const filePath = join(folderPath, file);
-      const buffer = readFileSync(filePath);
-      const ext = extname(file).toLowerCase();
+      const fileSize = statSync(filePath).size;
 
       const title = file
         .replace(/\.[^.]+$/, '')
@@ -156,12 +204,12 @@ async function syncConti() {
 
       console.log(`  ${folder}/${file} → "${title}"`);
 
-      const blob = await put(`praise/${file}`, buffer, {
-        access: 'public',
-        contentType: ext === '.pdf' ? 'application/pdf' : 'application/octet-stream',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-      });
+      // 날짜 서브디렉터리로 업로드 (같은 파일명이 여러 날짜에 사용될 수 있음)
+      execSync(
+        `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "mkdir -p '${FILE_SERVER_ASSETS_DIR}/praise/${folder}'"`,
+        { timeout: 10000 }
+      );
+      const fileUrl = uploadToServer(filePath, `praise/${folder}/${file}`);
 
       const season = detectSeason(file) || detectSeason(folder);
 
@@ -170,15 +218,15 @@ async function syncConti() {
           title,
           serviceDate,
           fileName: file,
-          fileUrl: blob.url,
-          fileSize: buffer.length,
+          fileUrl,
+          fileSize,
           musicalKey: null,
           theme: null,
           season,
         },
       });
 
-      existingNames.add(file);
+      existingKeys.add(compositeKey);
       synced++;
     }
   }
@@ -203,7 +251,7 @@ async function syncBulletins() {
 
   const folders = readdirSync(BULLETIN_DIR).filter(f => {
     const full = join(BULLETIN_DIR, f);
-    return statSync(full).isDirectory() && /^\d{6}_/.test(f);
+    return statSync(full).isDirectory() && /^(sun_)?\d{6}_/.test(f);
   }).sort();
 
   let synced = 0, skipped = 0;
@@ -227,8 +275,9 @@ async function syncBulletins() {
 
     if (files.length === 0) continue;
 
-    // 주차 라벨
-    const m = folder.match(/^(\d{4})(\d{2})_(.+)$/);
+    // 주차 라벨 (sun_ 접두사 제거 후 파싱)
+    const folderBase = folder.replace(/^sun_/i, '');
+    const m = folderBase.match(/^(\d{4})(\d{2})_(.+)$/);
     const label = m
       ? `${m[1]}년 ${parseInt(m[2])}월 ${isNaN(parseInt(m[3])) ? m[3] : m[3] + '주'}`
       : folder;
@@ -267,16 +316,11 @@ async function syncBulletins() {
     try { unlinkSync(zipPath); } catch {}
     execSync(`cd "${compressedDir}" && zip -j "${zipPath}" *.pdf`, { timeout: 30000 });
 
-    const zipBuffer = readFileSync(zipPath);
-    console.log(`    → ZIP: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+    const zipSize = statSync(zipPath).size;
+    console.log(`    → ZIP: ${(zipSize / 1024 / 1024).toFixed(1)}MB`);
 
-    // Vercel Blob 업로드
-    const blob = await put(`bulletins/${zipName}`, zipBuffer, {
-      access: 'public',
-      contentType: 'application/zip',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    });
+    // 파일 서버 업로드
+    const fileUrl = uploadToServer(zipPath, `bulletins/${zipName}`);
 
     // DB 생성: 하나의 Bulletin + 하나의 BulletinFile (ZIP)
     const bulletin = await prisma.bulletin.create({
@@ -287,8 +331,8 @@ async function syncBulletins() {
         files: {
           create: {
             fileName: zipName,
-            fileUrl: blob.url,
-            fileSize: zipBuffer.length,
+            fileUrl,
+            fileSize: zipSize,
           },
         },
       },
@@ -319,7 +363,8 @@ async function main() {
   console.log('=== 로컬 폴더 → 사이트 동기화 ===');
 
   if (doClean) {
-    await cleanBulletins();
+    if (doBulletin) await cleanBulletins();
+    if (doConti) await cleanConti();
   }
 
   let totalSynced = 0, totalSkipped = 0;
