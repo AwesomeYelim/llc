@@ -20,9 +20,20 @@ interface ContiItem {
 }
 
 type FilterType = "all" | "key" | "theme"
-type SortKey = "latest" | "title"
+type SortKey = "latest" | "title" | "key"
 
 const PAGE_SIZE = 12
+
+// musicalKey 파싱: "D,A:소망" → { keys: ["D","A"], theme: "소망" }
+function parseKey(raw: string | null): { keys: string[]; theme: string | null } {
+  if (!raw) return { keys: [], theme: null }
+  const colonIdx = raw.indexOf(":")
+  if (colonIdx === -1) return { keys: raw.split(",").map((k) => k.trim()), theme: null }
+  return {
+    keys: raw.substring(0, colonIdx).split(",").map((k) => k.trim()),
+    theme: raw.substring(colonIdx + 1).trim() || null,
+  }
+}
 
 export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [filterType, setFilterType] = useState<FilterType>("all")
@@ -30,17 +41,6 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<SortKey>("latest")
   const [currentPage, setCurrentPage] = useState(1)
-
-  // musicalKey 파싱: "D,A:소망" → { keys: ["D","A"], theme: "소망" }
-  function parseKey(raw: string | null): { keys: string[]; theme: string | null } {
-    if (!raw) return { keys: [], theme: null }
-    const colonIdx = raw.indexOf(":")
-    if (colonIdx === -1) return { keys: raw.split(",").map((k) => k.trim()), theme: null }
-    return {
-      keys: raw.substring(0, colonIdx).split(",").map((k) => k.trim()),
-      theme: raw.substring(colonIdx + 1).trim() || null,
-    }
-  }
 
   // Extract unique values for each filter type
   const filterOptions = useMemo(() => {
@@ -94,10 +94,20 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
 
     switch (sort) {
       case "latest":
-        result.sort((a, b) => new Date(b.serviceDate).getTime() - new Date(a.serviceDate).getTime())
+        result.sort((a, b) => {
+          const dateDiff = new Date(b.serviceDate).getTime() - new Date(a.serviceDate).getTime()
+          return dateDiff !== 0 ? dateDiff : b.id - a.id
+        })
         break
       case "title":
         result.sort((a, b) => a.title.localeCompare(b.title, "ko"))
+        break
+      case "key":
+        result.sort((a, b) => {
+          const ka = parseKey(a.musicalKey).keys[0] ?? "zzz"
+          const kb = parseKey(b.musicalKey).keys[0] ?? "zzz"
+          return ka.localeCompare(kb, "en")
+        })
         break
     }
 
@@ -119,6 +129,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const sortOptions: { key: SortKey; label: string }[] = [
     { key: "latest", label: "최신순" },
     { key: "title", label: "제목순" },
+    { key: "key", label: "코드순" },
   ]
 
   return (
