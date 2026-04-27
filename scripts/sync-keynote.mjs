@@ -1,5 +1,4 @@
 import 'dotenv/config'
-import { put } from '@vercel/blob'
 import { PrismaClient } from '@prisma/client'
 import {
   readFileSync, statSync, readdirSync,
@@ -10,6 +9,11 @@ import { execSync } from 'child_process'
 import os from 'os'
 
 const prisma = new PrismaClient()
+
+const FILE_SERVER_HOST = '138.2.119.220'
+const FILE_SERVER_USER = 'ubuntu'
+const FILE_SERVER_PATH = '/var/www/assets'
+const FILE_SERVER_BASE_URL = 'http://138.2.119.220/assets'
 
 const KEYNOTE_DIR = join(
   os.homedir(),
@@ -32,14 +36,16 @@ function parseTitle(filename) {
 // .key → PDF (AppleScript via osascript)
 function exportToPdf(keyPath, pdfPath) {
   const script = `
-tell application "Keynote"
-  set theDoc to open POSIX file ${JSON.stringify(keyPath)}
-  delay 3
+tell application "Keynote Creator Studio"
+  activate
+  open POSIX file ${JSON.stringify(keyPath)}
+  delay 4
+  set theDoc to front document
   export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
   close theDoc saving no
 end tell`
 
-  const scriptFile = join(TEMP_DIR, 'export.applescript')
+  const scriptFile = join(TEMP_DIR, `export_${Date.now()}.applescript`)
   writeFileSync(scriptFile, script)
 
   try {
@@ -49,8 +55,21 @@ end tell`
     console.error('  AppleScript 오류:', e.stderr?.toString()?.trim() || e.message)
     return false
   } finally {
-    if (existsSync(scriptFile)) unlinkSync(scriptFile)
+    try { unlinkSync(scriptFile) } catch {}
   }
+}
+
+function uploadToServer(localPath, remoteName) {
+  const remotePath = `${FILE_SERVER_PATH}/praise/${remoteName}`
+  execSync(
+    `ssh ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "mkdir -p ${FILE_SERVER_PATH}/praise"`,
+    { timeout: 15000 }
+  )
+  execSync(
+    `scp "${localPath}" ${FILE_SERVER_USER}@${FILE_SERVER_HOST}:"${remotePath}"`,
+    { timeout: 60000 }
+  )
+  return `${FILE_SERVER_BASE_URL}/praise/${encodeURIComponent(remoteName)}`
 }
 
 async function main() {
@@ -101,10 +120,15 @@ async function main() {
 
     console.log(`  업로드 중...`)
     const buffer = readFileSync(pdfPath)
-    const blob = await put(`praise/${pdfName}`, buffer, {
-      access: 'public',
-      contentType: 'application/pdf',
-    })
+
+    let fileUrl
+    try {
+      fileUrl = uploadToServer(pdfPath, pdfName)
+    } catch (e) {
+      console.error(`  업로드 실패 — skip\n`, e.message)
+      unlinkSync(pdfPath)
+      continue
+    }
 
     const musicalKey = parseMusicalKey(file)
     const title = parseTitle(file)
@@ -114,7 +138,7 @@ async function main() {
         title,
         serviceDate,
         fileName: pdfName,
-        fileUrl: blob.url,
+        fileUrl,
         fileSize: buffer.length,
         musicalKey,
         theme: null,

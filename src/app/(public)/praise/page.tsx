@@ -3,6 +3,8 @@ import { generatePageMetadata } from "@/lib/seo"
 import prisma from "@/lib/prisma"
 import { PraiseGrid } from "@/components/praise/PraiseGrid"
 
+export const revalidate = 300
+
 export const metadata: Metadata = generatePageMetadata(
   "찬양 콘티 & 가사 PPT",
   "동남 생명의 빛 교회 찬양 콘티와 가사 PPT를 무료로 다운로드하세요.",
