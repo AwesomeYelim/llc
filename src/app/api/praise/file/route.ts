@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -16,6 +17,8 @@ export async function GET(request: NextRequest) {
         data: { downloadCount: { increment: 1 } },
       })
     : await prisma.praiseConti.findUniqueOrThrow({ where: { id } })
+
+  if (mode === "download") revalidatePath("/praise")
 
   const fileRes = await fetch(conti.fileUrl)
   if (!fileRes.ok) {

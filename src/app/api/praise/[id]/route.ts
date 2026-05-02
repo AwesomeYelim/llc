@@ -33,6 +33,8 @@ export async function GET(
       })
     : await prisma.praiseConti.findUniqueOrThrow({ where: { id: parseInt(id) } })
 
+  if (mode === "download") revalidatePath("/praise")
+
   if (mode) {
     const fileRes = await fetch(conti.fileUrl)
     if (!fileRes.ok) {
