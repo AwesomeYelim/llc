@@ -20,10 +20,12 @@ export async function GET(
   const { id } = await params
   const isDownload = request.nextUrl.searchParams.get("download") === "1"
 
-  const file = await prisma.bulletinFile.update({
-    where: { id: parseInt(id) },
-    data: { downloadCount: { increment: 1 } },
-  })
+  const file = isDownload
+    ? await prisma.bulletinFile.update({
+        where: { id: parseInt(id) },
+        data: { downloadCount: { increment: 1 } },
+      })
+    : await prisma.bulletinFile.findUniqueOrThrow({ where: { id: parseInt(id) } })
 
   if (isDownload) {
     const fileRes = await fetch(file.fileUrl)

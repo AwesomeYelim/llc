@@ -308,7 +308,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                       <div className="flex justify-end gap-2 flex-wrap">
                         <QRButton url={conti.fileUrl} title={conti.title} />
                         <a
-                          href={`/api/praise/${conti.id}?view=1`}
+                          href={`/api/praise/file?id=${conti.id}&mode=view`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="shrink-0 px-4 py-2 border border-[#1e3a5f] text-[#1e3a5f] rounded-lg text-sm hover:bg-[#1e3a5f]/5 transition-colors"

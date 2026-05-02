@@ -10,7 +10,7 @@ interface DownloadButtonProps {
 export function DownloadButton({ fileUrl, fileName, id, endpoint }: DownloadButtonProps) {
   const handleDownload = () => {
     const a = document.createElement("a")
-    a.href = `${endpoint}/${id}?download=1`
+    a.href = `${endpoint}/file?id=${id}&mode=download`
     a.download = fileName
     a.click()
   }

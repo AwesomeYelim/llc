@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync } from 'fs';
-import { join, extname } from 'path';
+import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import { join, extname, basename } from 'path';
 import { execSync } from 'child_process';
 
 // ──────────────────────────────────────────────
@@ -36,7 +36,8 @@ const TEMP_DIR = '/tmp/sync-local';
 // ──────────────────────────────────────────────
 // Config — 로컬 폴더 경로
 // ──────────────────────────────────────────────
-const CONTI_DIR = process.env.CONTI_DIR || join(process.env.HOME, 'Downloads/교회관련/오후예배콘티');
+const CONTI_DIR = process.env.CONTI_DIR ||
+  join(process.env.HOME, 'Library/Mobile Documents/com~apple~Keynote/Documents/콘티& 악보');
 const BULLETIN_DIR = process.env.BULLETIN_DIR || join(process.env.HOME, 'Downloads/교회관련/주보 및 pdf');
 
 // ──────────────────────────────────────────────
@@ -159,7 +160,46 @@ async function cleanConti() {
 }
 
 // ──────────────────────────────────────────────
-// 콘티 동기화
+// Keynote → PDF 변환 (macOS osascript)
+// ──────────────────────────────────────────────
+function exportKeynoteToPdf(keyPath, pdfPath) {
+  const script = `tell application "Keynote Creator Studio"
+  activate
+  open POSIX file ${JSON.stringify(keyPath)}
+  delay 4
+  set theDoc to front document
+  export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
+  close theDoc saving no
+end tell`;
+  const scriptFile = `/tmp/_keynote_export_${Date.now()}.applescript`;
+  writeFileSync(scriptFile, script);
+  try {
+    execSync(`osascript ${JSON.stringify(scriptFile)}`, { timeout: 120000 });
+    return existsSync(pdfPath);
+  } catch (e) {
+    console.log(`    ⚠ PDF 변환 실패: ${e.message}`);
+    return false;
+  } finally {
+    try { unlinkSync(scriptFile); } catch {}
+  }
+}
+
+// ──────────────────────────────────────────────
+// 파일명에서 키/테마 파싱
+// 형식: (A:테마명)..., (G:테마)..., (A)(찬)..., (A,G:테마)...
+// ──────────────────────────────────────────────
+function parseKeyTheme(fileName) {
+  const base = fileName.replace(/\.[^.]+$/, '');
+  const m = base.match(/^\(([A-Gb#♭,]+)(?::([^)]+))?\)/);
+  if (!m) return { musicalKey: null, theme: null };
+  const musicalKey = m[1].split(',')[0].trim() || null;
+  const theme = m[2]?.trim() || null;
+  return { musicalKey, theme };
+}
+
+// ──────────────────────────────────────────────
+// 콘티 동기화 — Keynote Cloud 평탄 구조
+// ~/Library/Mobile Documents/com~apple~Keynote/Documents/콘티& 악보/
 // ──────────────────────────────────────────────
 async function syncConti() {
   console.log(`\n📁 콘티 폴더: ${CONTI_DIR}`);
@@ -168,69 +208,84 @@ async function syncConti() {
     return { synced: 0, skipped: 0 };
   }
 
-  // 중복 체크는 (serviceDate + fileName) 복합키로 — 같은 곡이 여러 날짜에 사용 가능
-  const existing = await prisma.praiseConti.findMany({ select: { serviceDate: true, fileName: true } });
-  const existingKeys = new Set(existing.map(e => `${e.serviceDate.toISOString()}|${e.fileName}`));
+  // 기존 DB: DB의 fileName(.pdf) → record  +  .key명 → record (변경 감지용)
+  // fileSize 는 원본 .key 파일 크기를 저장해 변경 감지에 사용
+  const existing = await prisma.praiseConti.findMany({
+    select: { id: true, fileName: true, serviceDate: true, fileSize: true },
+  });
+  // DB fileName 이 .pdf 형태이므로 .key 이름으로도 조회할 수 있게 양쪽 매핑
+  const existingMap = new Map(existing.map(e => [
+    e.fileName.replace(/\.pdf$/i, '.key'),  // .key 기준 조회
+    e,
+  ]));
 
-  const folders = readdirSync(CONTI_DIR).filter(f => {
+  // 평탄 구조: .key 파일만 (숨김 파일 제외)
+  const files = readdirSync(CONTI_DIR).filter(f => {
+    if (f.startsWith('.')) return false;
     const full = join(CONTI_DIR, f);
-    return statSync(full).isDirectory() && /^\d{6}$/.test(f);
+    return statSync(full).isFile() && /\.key$/i.test(f);
   }).sort();
 
-  let synced = 0, skipped = 0;
+  let synced = 0, skipped = 0, updated = 0;
 
-  for (const folder of folders) {
-    const serviceDate = parseContiDate(folder);
-    if (!serviceDate) continue;
+  for (const file of files) {
+    const filePath = join(CONTI_DIR, file);
+    const stat = statSync(filePath);
+    const serviceDate = new Date(stat.mtime);   // 수정일 = 최근 사용일
+    const fileSize = stat.size;
 
-    const folderPath = join(CONTI_DIR, folder);
-    const files = readdirSync(folderPath).filter(f =>
-      !f.startsWith('.') && /\.(pdf|key)$/i.test(f)
-    ).sort();
+    // 제목: (코드) 접두사 제거, + → 공백
+    const title = file
+      .replace(/\.[^.]+$/, '')
+      .replace(/^\([^)]+\)\s*/g, '')   // (A:테마) 제거
+      .replace(/\+/g, ' + ')
+      .trim();
 
-    for (const file of files) {
-      const compositeKey = `${serviceDate.toISOString()}|${file}`;
-      if (existingKeys.has(compositeKey)) {
+    const { musicalKey, theme } = parseKeyTheme(file);
+    const season = detectSeason(file);
+
+    // mtime 기준 변경 감지 (2초 오차 허용)
+    const existingRec = existingMap.get(file);
+    if (existingRec) {
+      const diff = Math.abs(existingRec.serviceDate.getTime() - serviceDate.getTime());
+      if (diff < 2000) {
         skipped++;
         continue;
       }
+      console.log(`  ↻ ${file} (수정됨)`);
+    } else {
+      console.log(`  + ${file} → "${title}"`);
+    }
 
-      const filePath = join(folderPath, file);
-      const fileSize = statSync(filePath).size;
+    // .key → PDF 변환
+    const pdfName = file.replace(/\.key$/i, '.pdf');
+    const pdfPath = `/tmp/${pdfName}`;
+    const ok = exportKeynoteToPdf(filePath, pdfPath);
+    if (!ok) {
+      console.log(`    건너뜀 (변환 실패)`);
+      skipped++;
+      continue;
+    }
+    const pdfSize = statSync(pdfPath).size;
 
-      const title = file
-        .replace(/\.[^.]+$/, '')
-        .replace(/^\d+\s*/, '');
+    const fileUrl = uploadToServer(pdfPath, `praise/${encodeURIComponent(pdfName)}`);
+    try { unlinkSync(pdfPath); } catch {}
 
-      console.log(`  ${folder}/${file} → "${title}"`);
-
-      // 날짜 서브디렉터리로 업로드 (같은 파일명이 여러 날짜에 사용될 수 있음)
-      execSync(
-        `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "mkdir -p '${FILE_SERVER_ASSETS_DIR}/praise/${folder}'"`,
-        { timeout: 10000 }
-      );
-      const fileUrl = uploadToServer(filePath, `praise/${folder}/${file}`);
-
-      const season = detectSeason(file) || detectSeason(folder);
-
-      await prisma.praiseConti.create({
-        data: {
-          title,
-          serviceDate,
-          fileName: file,
-          fileUrl,
-          fileSize,
-          musicalKey: null,
-          theme: null,
-          season,
-        },
+    if (existingRec) {
+      await prisma.praiseConti.update({
+        where: { id: existingRec.id },
+        data: { serviceDate, fileUrl, fileName: pdfName, fileSize: pdfSize, musicalKey, theme, season, title },
       });
-
-      existingKeys.add(compositeKey);
+      updated++;
+    } else {
+      await prisma.praiseConti.create({
+        data: { title, serviceDate, fileName: pdfName, fileUrl, fileSize: pdfSize, musicalKey, theme, season },
+      });
       synced++;
     }
   }
 
+  if (updated > 0) console.log(`  (수정 업데이트: ${updated}개)`);
   return { synced, skipped };
 }
 
