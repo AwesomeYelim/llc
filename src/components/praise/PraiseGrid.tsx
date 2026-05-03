@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import { DownloadButton } from "@/components/DownloadButton"
 import { QRButton } from "@/components/ui/QRButton"
 import { Pagination } from "@/components/ui/Pagination"
@@ -20,7 +20,7 @@ interface ContiItem {
 }
 
 type FilterType = "all" | "key" | "theme"
-type SortKey = "latest" | "title" | "key"
+type SortKey = "latest" | "title" | "key" | "downloads"
 
 const PAGE_SIZE = 12
 
@@ -41,6 +41,13 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<SortKey>("latest")
   const [currentPage, setCurrentPage] = useState(1)
+  const [localCounts, setLocalCounts] = useState<Record<number, number>>(
+    () => Object.fromEntries(contis.map((c) => [c.id, c.downloadCount]))
+  )
+
+  const handleDownload = useCallback((id: number) => {
+    setLocalCounts((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))
+  }, [])
 
   // Extract unique values for each filter type
   const filterOptions = useMemo(() => {
@@ -109,10 +116,13 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
           return ka.localeCompare(kb, "en")
         })
         break
+      case "downloads":
+        result.sort((a, b) => (localCounts[b.id] ?? 0) - (localCounts[a.id] ?? 0))
+        break
     }
 
     return result
-  }, [contis, search, filterType, selectedValue, sort])
+  }, [contis, search, filterType, selectedValue, sort, localCounts])
 
   // Reset to page 1 when filter/sort changes
   useEffect(() => { setCurrentPage(1) }, [search, filterType, selectedValue, sort])
@@ -130,6 +140,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
     { key: "latest", label: "최신순" },
     { key: "title", label: "제목순" },
     { key: "key", label: "코드순" },
+    { key: "downloads", label: "다운로드순" },
   ]
 
   return (
@@ -302,7 +313,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                       </div>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white hidden md:table-cell">
-                      <span className="text-[#43474e] text-sm">{conti.downloadCount}회</span>
+                      <span className="text-[#43474e] text-sm">{localCounts[conti.id] ?? conti.downloadCount}회</span>
                     </td>
                     <td className="px-6 lg:px-8 py-8 bg-white last:rounded-r-xl text-right">
                       <div className="flex justify-end gap-2 flex-wrap">
@@ -320,6 +331,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                           fileName={conti.fileName}
                           id={conti.id}
                           endpoint="/api/praise"
+                          onDownload={() => handleDownload(conti.id)}
                         />
                       </div>
                     </td>

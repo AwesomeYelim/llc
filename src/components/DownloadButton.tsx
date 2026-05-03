@@ -5,10 +5,12 @@ interface DownloadButtonProps {
   fileName: string
   id: number
   endpoint: string
+  onDownload?: () => void
 }
 
-export function DownloadButton({ fileUrl, fileName, id, endpoint }: DownloadButtonProps) {
+export function DownloadButton({ fileUrl, fileName, id, endpoint, onDownload }: DownloadButtonProps) {
   const handleDownload = () => {
+    onDownload?.()
     const a = document.createElement("a")
     a.href = `${endpoint}/file?id=${id}&mode=download`
     a.download = fileName
