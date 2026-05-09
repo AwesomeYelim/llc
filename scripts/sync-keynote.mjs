@@ -36,10 +36,15 @@ function parseTitle(filename) {
 // .key → PDF (AppleScript via osascript)
 function exportToPdf(keyPath, pdfPath) {
   const script = `
+if not (application "Keynote Creator Studio" is running) then
+  tell application "Keynote Creator Studio" to launch
+  delay 8
+end if
+
 tell application "Keynote Creator Studio"
   activate
   open POSIX file ${JSON.stringify(keyPath)}
-  delay 4
+  delay 6
   set theDoc to front document
   export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
   close theDoc saving no
