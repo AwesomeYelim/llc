@@ -86,7 +86,7 @@ export default async function BulletinPage({
                                 download={file.fileName}
                                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#022448] text-white text-sm font-medium hover:bg-[#1e3a5f] transition-colors"
                               >
-                                <span className="material-symbols-outlined text-sm">download</span>
+                                <span className="material-symbols-outlined text-sm leading-[0]">download</span>
                                 {file.fileName.endsWith(".zip") ? "주보+PPT" : file.fileName.split(".").pop()?.toUpperCase()}
                                 <span className="text-white/60 text-xs">({formatFileSize(file.fileSize)})</span>
                               </a>

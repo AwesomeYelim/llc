@@ -57,7 +57,7 @@ export function Footer() {
               className="w-10 h-10 rounded-full border border-[#c4c6cf] flex items-center justify-center text-[#022448] hover:bg-[#022448] hover:text-white transition-all"
               aria-label="Blog"
             >
-              <span className="material-symbols-outlined text-xl">edit_note</span>
+              <span className="material-symbols-outlined text-xl leading-[0]">edit_note</span>
             </a>
           </div>
         </div>

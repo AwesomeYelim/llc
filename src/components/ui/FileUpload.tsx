@@ -120,8 +120,8 @@ export function FileUpload({
             <p className="text-xs text-gray-400 pt-1">클릭하여 추가하거나 파일을 드래그</p>
           </div>
         ) : (
-          <div className="text-sm text-gray-500">
-            <span className="material-symbols-outlined text-3xl text-gray-300 mb-2 block">upload_file</span>
+          <div className="text-sm text-gray-500 flex flex-col items-center">
+            <span className="material-symbols-outlined text-3xl text-gray-300 leading-[0] mb-2">upload_file</span>
             <p className="mb-1">
               {multiple ? "파일들을 드래그하거나 클릭하여 업로드" : "파일을 드래그하거나 클릭하여 업로드"}
             </p>

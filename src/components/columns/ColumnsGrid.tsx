@@ -155,13 +155,13 @@ export function ColumnsGrid({ columns }: { columns: ColumnItem[] }) {
                     <div className="flex items-center gap-3 text-xs text-[#43474e]">
                       <span>{formatDate(col.sermonDate || col.createdAt)}</span>
                       <span className="flex items-center gap-0.5">
-                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        <span className="material-symbols-outlined text-sm leading-[0]">visibility</span>
                         {col.viewCount}
                       </span>
                     </div>
                     <span className="text-[#795900] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       읽기
-                      <span className="material-symbols-outlined text-base">arrow_forward</span>
+                      <span className="material-symbols-outlined text-base leading-[0]">arrow_forward</span>
                     </span>
                   </div>
                 </article>

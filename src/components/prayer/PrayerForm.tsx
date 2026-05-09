@@ -40,8 +40,8 @@ export function PrayerForm() {
 
   if (done) {
     return (
-      <div className="bg-[#f5f3f0] rounded-xl p-8 text-center">
-        <span className="material-symbols-outlined text-[#795900] text-5xl mb-4 block">
+      <div className="bg-[#f5f3f0] rounded-xl p-8 flex flex-col items-center">
+        <span className="material-symbols-outlined text-[#795900] text-5xl leading-[0] mb-4">
           favorite
         </span>
         <h3 className="font-serif text-xl text-[#022448] mb-2">기도 제목이 전달되었습니다</h3>

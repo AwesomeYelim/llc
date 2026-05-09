@@ -66,11 +66,11 @@ export default async function SermonDetailPage({ params }: Props) {
         </h1>
         <div className="flex items-center gap-4 text-[#43474e]">
           <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-base">menu_book</span>
+            <span className="material-symbols-outlined text-base leading-[0]">menu_book</span>
             {sermon.scripture}
           </span>
           <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-base">calendar_today</span>
+            <span className="material-symbols-outlined text-base leading-[0]">calendar_today</span>
             {formatDate(sermon.sermonDate)}
           </span>
         </div>

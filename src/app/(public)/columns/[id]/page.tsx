@@ -195,7 +195,7 @@ export default async function ColumnDetailPage({ params }: Props) {
               </div>
               {column.scripture && (
                 <span className="flex items-center gap-1 text-[#795900] font-semibold text-sm">
-                  <span className="material-symbols-outlined text-base">menu_book</span>
+                  <span className="material-symbols-outlined text-base leading-[0]">menu_book</span>
                   {column.scripture}
                 </span>
               )}
@@ -260,7 +260,7 @@ export default async function ColumnDetailPage({ params }: Props) {
                 className="text-sm text-[#795900] font-semibold hover:underline flex items-center gap-1"
               >
                 네이버 블로그 원문
-                <span className="material-symbols-outlined text-base">open_in_new</span>
+                <span className="material-symbols-outlined text-base leading-[0]">open_in_new</span>
               </a>
             )}
           </div>
@@ -293,7 +293,7 @@ export default async function ColumnDetailPage({ params }: Props) {
                 className="text-[#795900] font-bold text-sm hover:underline flex items-center gap-1"
               >
                 전체 보기
-                <span className="material-symbols-outlined text-base">arrow_forward</span>
+                <span className="material-symbols-outlined text-base leading-[0]">arrow_forward</span>
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -316,7 +316,7 @@ export default async function ColumnDetailPage({ params }: Props) {
                   </p>
                   <span className="mt-4 text-[#795900] text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                     읽기
-                    <span className="material-symbols-outlined text-base">arrow_forward</span>
+                    <span className="material-symbols-outlined text-base leading-[0]">arrow_forward</span>
                   </span>
                 </Link>
               ))}

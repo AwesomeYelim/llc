@@ -76,7 +76,7 @@ export function RecentSermons({ sermons }: { sermons: Sermon[] }) {
                   <div className="absolute inset-0 bg-[#022448]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center text-[#022448] shadow-xl">
                       <span
-                        className="material-symbols-outlined text-4xl"
+                        className="material-symbols-outlined text-4xl leading-[0]"
                         style={{ fontVariationSettings: "'FILL' 1" }}
                       >
                         play_arrow
@@ -93,7 +93,7 @@ export function RecentSermons({ sermons }: { sermons: Sermon[] }) {
                 <p className="text-[#43474e] mt-2 text-sm">{sermon.scripture}</p>
                 <div className="flex items-center gap-4 mt-4 text-sm text-[#43474e]">
                   <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-base">calendar_today</span>
+                    <span className="material-symbols-outlined text-base leading-[0]">calendar_today</span>
                     {formatDate(sermon.sermonDate)}
                   </span>
                 </div>

@@ -73,7 +73,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
             className="absolute top-4 right-4 text-white/80 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             aria-label="닫기"
           >
-            <span className="material-symbols-outlined text-2xl">close</span>
+            <span className="material-symbols-outlined text-2xl leading-[0]">close</span>
           </button>
 
           {/* Counter */}
@@ -87,7 +87,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
             className="absolute left-4 text-white/80 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             aria-label="이전"
           >
-            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+            <span className="material-symbols-outlined text-2xl leading-[0]">chevron_left</span>
           </button>
 
           {/* Image */}
@@ -110,7 +110,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
             className="absolute right-4 text-white/80 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             aria-label="다음"
           >
-            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+            <span className="material-symbols-outlined text-2xl leading-[0]">chevron_right</span>
           </button>
 
           {/* Title */}

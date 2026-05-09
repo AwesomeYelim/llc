@@ -271,7 +271,7 @@ export function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className="w-8 h-8 flex items-center justify-center text-[#74777f] hover:text-[#022448]"
                 >
-                  <span className="material-symbols-outlined text-xl">close</span>
+                  <span className="material-symbols-outlined text-xl leading-[0]">close</span>
                 </button>
               </div>
 

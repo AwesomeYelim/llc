@@ -15,7 +15,7 @@ export function QRButton({ url, title }: { url: string; title: string }) {
         className="shrink-0 flex items-center justify-center px-3 py-2 border border-[#e4e2df] text-[#43474e] rounded-lg text-sm hover:bg-[#f5f3f0] transition-colors"
         aria-label="QR 코드"
       >
-        <span className="material-symbols-outlined text-base leading-none">qr_code</span>
+        <span className="material-symbols-outlined text-[20px] leading-[0]">qr_code</span>
       </button>
 
       {open && (

@@ -194,9 +194,9 @@ export function CalendarView({
       )}
 
       {events.length === 0 && (
-        <div className="mt-8 text-center py-16 text-[#43474e]">
-          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4 block">event_busy</span>
-          이달의 등록된 일정이 없습니다.
+        <div className="mt-8 py-16 flex flex-col items-center gap-3 text-[#43474e]">
+          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl">event_busy</span>
+          <p>이달의 등록된 일정이 없습니다.</p>
         </div>
       )}
 

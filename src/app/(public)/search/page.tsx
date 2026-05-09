@@ -139,16 +139,16 @@ export default async function SearchPage({
       </form>
 
       {!q && (
-        <div className="text-center py-24 text-[#43474e]">
-          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4 block">search</span>
-          검색어를 입력하세요.
+        <div className="py-24 flex flex-col items-center gap-3 text-[#43474e]">
+          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl leading-[0]">search</span>
+          <p>검색어를 입력하세요.</p>
         </div>
       )}
 
       {q && total === 0 && (
-        <div className="text-center py-24 text-[#43474e]">
-          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl mb-4 block">search_off</span>
-          &ldquo;{q}&rdquo;에 대한 검색 결과가 없습니다.
+        <div className="py-24 flex flex-col items-center gap-3 text-[#43474e]">
+          <span className="material-symbols-outlined text-[#c4c6cf] text-6xl leading-[0]">search_off</span>
+          <p>&ldquo;{q}&rdquo;에 대한 검색 결과가 없습니다.</p>
         </div>
       )}
 

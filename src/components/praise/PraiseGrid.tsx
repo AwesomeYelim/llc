@@ -177,7 +177,7 @@ export function PraiseGrid({ contis }: { contis: ContiItem[] }) {
                     : "bg-[#f5f3f0] text-[#43474e] hover:bg-[#e8e6e3]"
                 }`}
               >
-                <span className="material-symbols-outlined text-base">{tab.icon}</span>
+                <span className="material-symbols-outlined text-base leading-[0]">{tab.icon}</span>
                 {tab.label}
               </button>
             ))}
