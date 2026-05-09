@@ -33,18 +33,36 @@ function parseTitle(filename) {
   return name.replace(/^\([^)]+\)\s*/, '').trim() || name
 }
 
+// Keynote Creator Studio 앱 실행 보장
+function ensureKeynoteRunning() {
+  try {
+    execSync('pgrep -f "Keynote Creator Studio"', { stdio: 'ignore' })
+    return // 이미 실행 중
+  } catch {}
+
+  console.log('  Keynote Creator Studio 실행 중...')
+  execSync('open -a "Keynote Creator Studio"', { timeout: 15000 })
+
+  // 최대 20초 대기하며 실행 확인
+  for (let i = 0; i < 20; i++) {
+    execSync('sleep 1')
+    try {
+      execSync('pgrep -f "Keynote Creator Studio"', { stdio: 'ignore' })
+      execSync('sleep 3') // 완전 로드 대기
+      console.log('  앱 준비 완료')
+      return
+    } catch {}
+  }
+  throw new Error('Keynote Creator Studio 시작 실패 (20초 초과)')
+}
+
 // .key → PDF (AppleScript via osascript)
 function exportToPdf(keyPath, pdfPath) {
   const script = `
-if not (application "Keynote Creator Studio" is running) then
-  tell application "Keynote Creator Studio" to launch
-  delay 8
-end if
-
 tell application "Keynote Creator Studio"
   activate
   open POSIX file ${JSON.stringify(keyPath)}
-  delay 6
+  delay 5
   set theDoc to front document
   export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
   close theDoc saving no
@@ -79,6 +97,8 @@ function uploadToServer(localPath, remoteName) {
 
 async function main() {
   if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR, { recursive: true })
+
+  ensureKeynoteRunning()
 
   // DB에 이미 있는 파일명
   const existing = await prisma.praiseConti.findMany({ select: { fileName: true } })
