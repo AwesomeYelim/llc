@@ -38,7 +38,8 @@ const TEMP_DIR = '/tmp/sync-local';
 // ──────────────────────────────────────────────
 const CONTI_DIR = process.env.CONTI_DIR ||
   join(process.env.HOME, 'Library/Mobile Documents/com~apple~Keynote/Documents/콘티& 악보');
-const BULLETIN_DIR = process.env.BULLETIN_DIR || join(process.env.HOME, 'Downloads/교회관련/주보 및 pdf');
+const BULLETIN_DIR = process.env.BULLETIN_DIR ||
+  join(process.env.HOME, 'Library/CloudStorage/GoogleDrive-lightoflifechurch1227@gmail.com/My Drive/bulletin');
 
 // ──────────────────────────────────────────────
 // 절기 키워드
