@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/sync/youtube",
-      "schedule": "0 6,14 * * *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/sync/blog",
