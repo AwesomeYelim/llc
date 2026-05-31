@@ -41,7 +41,8 @@ function ensureKeynoteRunning() {
   } catch {}
 
   console.log('  Keynote Creator Studio 실행 중...')
-  execSync('open -a "Keynote Creator Studio"', { timeout: 15000 })
+  // --args -NSQuitWhenLastWindowClosed NO: 복원 창 없이 실행
+  execSync('open -a "Keynote Creator Studio" --args -ApplePersistenceIgnoreState YES', { timeout: 15000 })
 
   // 최대 20초 대기하며 실행 확인
   for (let i = 0; i < 20; i++) {
