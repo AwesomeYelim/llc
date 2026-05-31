@@ -101,8 +101,6 @@ function uploadToServer(localPath, remoteName) {
 async function main() {
   if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR, { recursive: true })
 
-  ensureKeynoteRunning()
-
   // DB에 이미 있는 파일명
   const existing = await prisma.praiseConti.findMany({ select: { fileName: true } })
   const existingNames = new Set(existing.map((e) => e.fileName))
@@ -130,6 +128,9 @@ async function main() {
     await prisma.$disconnect()
     return
   }
+
+  // 새 파일이 있을 때만 Keynote 실행
+  ensureKeynoteRunning()
 
   console.log(`새 파일 ${newFiles.length}개 발견\n`)
 
