@@ -69,12 +69,31 @@ async function syncYoutube() {
     synced++
   }
 
-  if (newPaths.length > 0) {
-    notifyIndexNow(newPaths)
+  // 삭제된 영상 정리: DB의 모든 youtubeId를 oEmbed로 확인
+  const allSermons = await prisma.sermon.findMany({
+    select: { id: true, youtubeId: true },
+    where: { youtubeId: { not: null } },
+  })
+
+  let deleted = 0
+  for (const sermon of allSermons) {
+    if (!sermon.youtubeId) continue
+    const check = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${sermon.youtubeId}&format=json`,
+      { cache: "no-store" }
+    )
+    if (check.status === 404) {
+      await prisma.sermon.delete({ where: { id: sermon.id } })
+      deleted++
+    }
+  }
+
+  if (newPaths.length > 0 || deleted > 0) {
+    if (newPaths.length > 0) notifyIndexNow(newPaths)
     revalidatePath("/sermons")
   }
 
-  return { success: true, synced, skipped, total: videos.length }
+  return { success: true, synced, skipped, deleted, total: videos.length }
 }
 
 // Vercel Cron (매일 자동)
