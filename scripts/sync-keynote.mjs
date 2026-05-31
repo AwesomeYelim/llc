@@ -60,12 +60,14 @@ function ensureKeynoteRunning() {
 function exportToPdf(keyPath, pdfPath) {
   const script = `
 tell application "Keynote Creator Studio"
-  activate
-  open POSIX file ${JSON.stringify(keyPath)}
+  set theDoc to open POSIX file ${JSON.stringify(keyPath)}
   delay 5
-  set theDoc to front document
-  export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
-  close theDoc saving no
+  try
+    export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
+  end try
+  try
+    close theDoc saving no
+  end try
 end tell`
 
   const scriptFile = join(TEMP_DIR, `export_${Date.now()}.applescript`)
@@ -181,6 +183,11 @@ async function main() {
     unlinkSync(pdfPath)
     added++
   }
+
+  // 혹시 열린 문서 있으면 전부 닫기
+  try {
+    execSync(`osascript -e 'tell application "Keynote Creator Studio" to close every document saving no'`, { timeout: 15000 })
+  } catch {}
 
   console.log(`완료: ${added}개 추가됨`)
   await prisma.$disconnect()
