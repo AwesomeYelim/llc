@@ -7,6 +7,7 @@ import {
 import { join, basename } from 'path'
 import { execSync } from 'child_process'
 import os from 'os'
+import { nearestSunday, kstDateString } from './lib/service-date.mjs'
 
 const prisma = new PrismaClient()
 
@@ -186,8 +187,9 @@ async function main() {
     const keyPath = join(KEYNOTE_DIR, file)
     const pdfPath = join(TEMP_DIR, pdfName)
 
-    // 생성일 = 예배일
-    const serviceDate = statSync(keyPath).birthtime
+    // 콘티는 주일 예배를 위해 만들어지므로, 생성일이 속한 주일을 예배일로 쓴다.
+    // birthtime 을 그대로 넣으면 토요일 같은 평일 날짜가 그대로 노출된다.
+    const serviceDate = nearestSunday(statSync(keyPath).birthtime)
 
     console.log(`[${added + 1}/${newFiles.length}] ${file}`)
     console.log(`  변환 중 (.key → PDF)...`)
@@ -236,7 +238,7 @@ async function main() {
           downloadCount: 0,
         },
       })
-      console.log(`  ✓ "${title}" | 키: ${musicalKey ?? '없음'} | 날짜: ${serviceDate.toLocaleDateString('ko-KR')}\n`)
+      console.log(`  ✓ "${title}" | 키: ${musicalKey ?? '없음'} | 예배일: ${kstDateString(serviceDate)}\n`)
     }
     unlinkSync(pdfPath)
     added++

@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { AdminLayout } from "@/components/layout/AdminLayout"
 import { Input } from "@/components/ui/Input"
 import { Button } from "@/components/ui/Button"
+import { toDateInputValue } from "@/lib/utils"
 
 export default function EditBulletinPage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function EditBulletinPage() {
         if (!res.ok) throw new Error("Failed to fetch bulletin")
         const data = await res.json()
         setTitle(data.title)
-        setServiceDate(new Date(data.serviceDate).toISOString().split("T")[0])
+        setServiceDate(toDateInputValue(data.serviceDate))
         setBulletinType(data.bulletinType)
       } catch {
         setError("주보 정보를 불러올 수 없습니다.")

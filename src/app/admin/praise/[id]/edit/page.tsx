@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { AdminLayout } from "@/components/layout/AdminLayout"
 import { Input } from "@/components/ui/Input"
 import { Button } from "@/components/ui/Button"
+import { toDateInputValue } from "@/lib/utils"
 
 export default function EditPraisePage() {
   const router = useRouter()
@@ -27,7 +28,7 @@ export default function EditPraisePage() {
         if (!res.ok) throw new Error("Failed to fetch conti")
         const data = await res.json()
         setTitle(data.title)
-        setServiceDate(new Date(data.serviceDate).toISOString().split("T")[0])
+        setServiceDate(toDateInputValue(data.serviceDate))
         setMusicalKey(data.musicalKey || "")
         setTheme(data.theme || "")
         setSeason(data.season || "")

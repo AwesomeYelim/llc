@@ -15,6 +15,7 @@
     "sync:conti": "node scripts/sync-local.mjs --conti",
     "sync:bulletin": "node scripts/sync-local.mjs --bulletin",
     "sync:keynote": "node scripts/sync-keynote.mjs",
+    "fix:dates": "node scripts/fix-service-dates.mjs",
     "launchd:install": "cp scripts/com.dongnam.sync-keynote.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.dongnam.sync-keynote.plist && echo '✓ launchd 등록 완료'",
     "launchd:uninstall": "launchctl unload ~/Library/LaunchAgents/com.dongnam.sync-keynote.plist && rm ~/Library/LaunchAgents/com.dongnam.sync-keynote.plist && echo '✓ launchd 제거 완료'",
     "test:unit": "vitest run",

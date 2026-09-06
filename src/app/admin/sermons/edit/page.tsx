@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { AdminLayout } from "@/components/layout/AdminLayout"
 import { SermonForm } from "@/components/admin/SermonForm"
+import { toDateInputValue } from "@/lib/utils"
 
 export default async function EditSermonPage({
   searchParams,
@@ -30,7 +31,7 @@ export default async function EditSermonPage({
             id: sermon.id,
             title: sermon.title,
             scripture: sermon.scripture,
-            sermonDate: sermon.sermonDate.toISOString().split("T")[0],
+            sermonDate: toDateInputValue(sermon.sermonDate),
             serviceType: sermon.serviceType,
             youtubeUrl: sermon.youtubeUrl || "",
             blogUrl: sermon.blogUrl || "",

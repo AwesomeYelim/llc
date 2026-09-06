@@ -5,17 +5,40 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// 예배일은 항상 한국 시간 기준이다.
+// getFullYear/getMonth/getDate는 실행 환경의 로컬 시간을 따르므로,
+// UTC로 동작하는 서버(Vercel)에서는 KST 자정(= 전날 15:00Z)으로 저장된
+// 주일 날짜가 하루 앞인 토요일로 밀린다. 항상 KST로 포맷한다.
+const KST_TIME_ZONE = "Asia/Seoul"
+
+function kstParts(date: Date | string): { year: number; month: number; day: number } {
+  // en-CA 로캘은 YYYY-MM-DD 형식을 보장한다.
+  const [year, month, day] = new Intl.DateTimeFormat("en-CA", {
+    timeZone: KST_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(new Date(date))
+    .split("-")
+    .map(Number)
+  return { year, month, day }
+}
+
 export function formatDate(date: Date | string): string {
-  const d = new Date(date)
-  const year = d.getFullYear()
-  const month = d.getMonth() + 1
-  const day = d.getDate()
+  const { year, month, day } = kstParts(date)
   return `${year}년 ${month}월 ${day}일`
 }
 
 export function formatDateShort(date: Date | string): string {
-  const d = new Date(date)
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`
+  const { year, month, day } = kstParts(date)
+  return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`
+}
+
+/** <input type="date"> 에 넣을 YYYY-MM-DD (KST 기준) */
+export function toDateInputValue(date: Date | string = new Date()): string {
+  const { year, month, day } = kstParts(date)
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }
 
 export function extractYoutubeId(url: string): string | null {

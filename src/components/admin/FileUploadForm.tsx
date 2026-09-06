@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { FileUpload } from "@/components/ui/FileUpload"
+import { toDateInputValue } from "@/lib/utils"
 
 interface FileUploadFormProps {
   type: "praise" | "bulletin"
@@ -15,7 +16,7 @@ export function FileUploadForm({ type, bulletinType: defaultBulletinType }: File
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState("")
-  const [serviceDate, setServiceDate] = useState(new Date().toISOString().split("T")[0])
+  const [serviceDate, setServiceDate] = useState(toDateInputValue())
   const [file, setFile] = useState<File | null>(null)
   const [files, setFiles] = useState<File[]>([])
   const [selectedBulletinType, setSelectedBulletinType] = useState(defaultBulletinType || "BULLETIN")

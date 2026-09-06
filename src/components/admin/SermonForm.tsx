@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import { Input, Textarea } from "@/components/ui/Input"
-import { extractYoutubeId } from "@/lib/utils"
+import { extractYoutubeId, toDateInputValue } from "@/lib/utils"
 
 interface SermonFormProps {
   initial?: {
@@ -27,7 +27,7 @@ export function SermonForm({ initial }: SermonFormProps) {
   const [form, setForm] = useState({
     title: initial?.title || "",
     scripture: initial?.scripture || "",
-    sermonDate: initial?.sermonDate || new Date().toISOString().split("T")[0],
+    sermonDate: initial?.sermonDate || toDateInputValue(),
     serviceType: initial?.serviceType || "SUNDAY_MAIN",
     youtubeUrl: initial?.youtubeUrl || "",
     blogUrl: initial?.blogUrl || "",

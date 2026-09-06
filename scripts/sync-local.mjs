@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
 import { join, extname, basename } from 'path';
 import { execSync } from 'child_process';
+import { nearestSunday, parseBulletinFolderDate, kstDateString } from './lib/service-date.mjs';
 
 // ──────────────────────────────────────────────
 // 파일 서버 설정
@@ -76,42 +77,6 @@ function compressPdf(inputPath, outputPath) {
   } catch {
     return false;
   }
-}
-
-// ──────────────────────────────────────────────
-// 콘티 폴더명 → 날짜 (YYMMDD → Date)
-// ──────────────────────────────────────────────
-function parseContiDate(folderName) {
-  const m = folderName.match(/^(\d{2})(\d{2})(\d{2})$/);
-  if (!m) return null;
-  const year = 2000 + parseInt(m[1]);
-  const month = parseInt(m[2]);
-  const day = parseInt(m[3]);
-  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-  return new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
-}
-
-// ──────────────────────────────────────────────
-// 주보 폴더명 → 날짜 (YYYYMM_N → 해당 월 N번째 일요일)
-// ──────────────────────────────────────────────
-function parseBulletinDate(folderName) {
-  // sun_YYYYMM_N 또는 YYYYMM_N 둘 다 지원
-  const m = folderName.replace(/^sun_/i, '').match(/^(\d{4})(\d{2})_(\d+|.+)$/);
-  if (!m) return null;
-  const year = parseInt(m[1]);
-  const month = parseInt(m[2]);
-  const weekOrLabel = m[3];
-
-  const weekNum = parseInt(weekOrLabel);
-  if (isNaN(weekNum)) {
-    const lastDay = new Date(year, month, 0).getDate();
-    return new Date(`${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`);
-  }
-
-  const firstDay = new Date(year, month - 1, 1);
-  const firstSunday = firstDay.getDay() === 0 ? 1 : 8 - firstDay.getDay();
-  const targetDay = Math.min(firstSunday + (weekNum - 1) * 7, new Date(year, month, 0).getDate());
-  return new Date(`${year}-${String(month).padStart(2, '0')}-${String(targetDay).padStart(2, '0')}`);
 }
 
 // ──────────────────────────────────────────────
@@ -212,7 +177,7 @@ async function syncConti() {
   // 기존 DB: DB의 fileName(.pdf) → record  +  .key명 → record (변경 감지용)
   // fileSize 는 원본 .key 파일 크기를 저장해 변경 감지에 사용
   const existing = await prisma.praiseConti.findMany({
-    select: { id: true, fileName: true, serviceDate: true, fileSize: true },
+    select: { id: true, fileName: true, serviceDate: true, fileSize: true, createdAt: true },
   });
   // DB fileName 이 .pdf 형태이므로 .key 이름으로도 조회할 수 있게 양쪽 매핑
   const existingMap = new Map(existing.map(e => [
@@ -232,7 +197,9 @@ async function syncConti() {
   for (const file of files) {
     const filePath = join(CONTI_DIR, file);
     const stat = statSync(filePath);
-    const serviceDate = new Date(stat.mtime);   // 수정일 = 최근 사용일
+    // 콘티는 주일 예배 전후로 마지막 수정되므로, 수정일이 속한 주일을 예배일로 쓴다.
+    // mtime 을 그대로 넣으면 토요일/월요일 같은 평일 날짜가 그대로 노출된다.
+    const serviceDate = nearestSunday(stat.mtime);
     const fileSize = stat.size;
 
     // 제목: (코드) 접두사 제거, + → 공백
@@ -245,17 +212,17 @@ async function syncConti() {
     const { musicalKey, theme } = parseKeyTheme(file);
     const season = detectSeason(file);
 
-    // mtime 기준 변경 감지 (2초 오차 허용)
+    // 변경 감지: 마지막 동기화 시각(createdAt)보다 .key 가 더 최신이면 재동기화.
+    // serviceDate 는 주일로 스냅되어 같은 주 안의 수정을 구분하지 못하므로 쓰지 않는다.
     const existingRec = existingMap.get(file);
     if (existingRec) {
-      const diff = Math.abs(existingRec.serviceDate.getTime() - serviceDate.getTime());
-      if (diff < 2000) {
+      if (stat.mtime <= existingRec.createdAt) {
         skipped++;
         continue;
       }
       console.log(`  ↻ ${file} (수정됨)`);
     } else {
-      console.log(`  + ${file} → "${title}"`);
+      console.log(`  + ${file} → "${title}" | 예배일 ${kstDateString(serviceDate)}`);
     }
 
     // .key → PDF 변환
@@ -275,7 +242,7 @@ async function syncConti() {
     if (existingRec) {
       await prisma.praiseConti.update({
         where: { id: existingRec.id },
-        data: { serviceDate, fileUrl, fileName: pdfName, fileSize: pdfSize, musicalKey, theme, season, title },
+        data: { serviceDate, fileUrl, fileName: pdfName, fileSize: pdfSize, musicalKey, theme, season, title, createdAt: new Date() },
       });
       updated++;
     } else {
@@ -313,7 +280,7 @@ async function syncBulletins() {
   let synced = 0, skipped = 0;
 
   for (const folder of folders) {
-    const serviceDate = parseBulletinDate(folder);
+    const serviceDate = parseBulletinFolderDate(folder);
     if (!serviceDate) continue;
 
     const zipName = `${folder}.zip`;
