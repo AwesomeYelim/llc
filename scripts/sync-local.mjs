@@ -4,6 +4,7 @@ import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync, writeFileSync
 import { join, extname, basename } from 'path';
 import { execSync } from 'child_process';
 import { nearestSunday, parseBulletinFolderDate, kstDateString } from './lib/service-date.mjs';
+import { fileKey } from './lib/filename.mjs';
 
 // ──────────────────────────────────────────────
 // 파일 서버 설정
@@ -181,7 +182,7 @@ async function syncConti() {
   });
   // DB fileName 이 .pdf 형태이므로 .key 이름으로도 조회할 수 있게 양쪽 매핑
   const existingMap = new Map(existing.map(e => [
-    e.fileName.replace(/\.pdf$/i, '.key'),  // .key 기준 조회
+    fileKey(e.fileName.replace(/\.pdf$/i, '.key')),  // .key 기준 조회 (NFC 정규화)
     e,
   ]));
 
@@ -214,7 +215,7 @@ async function syncConti() {
 
     // 변경 감지: 마지막 동기화 시각(createdAt)보다 .key 가 더 최신이면 재동기화.
     // serviceDate 는 주일로 스냅되어 같은 주 안의 수정을 구분하지 못하므로 쓰지 않는다.
-    const existingRec = existingMap.get(file);
+    const existingRec = existingMap.get(fileKey(file));
     if (existingRec) {
       if (stat.mtime <= existingRec.createdAt) {
         skipped++;
@@ -270,7 +271,7 @@ async function syncBulletins() {
   if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR, { recursive: true });
 
   const existingFiles = await prisma.bulletinFile.findMany({ select: { fileName: true } });
-  const existingNames = new Set(existingFiles.map(e => e.fileName));
+  const existingNames = new Set(existingFiles.map(e => fileKey(e.fileName)));
 
   const folders = readdirSync(BULLETIN_DIR).filter(f => {
     const full = join(BULLETIN_DIR, f);
@@ -286,7 +287,7 @@ async function syncBulletins() {
     const zipName = `${folder}.zip`;
 
     // 이미 올라간 폴더는 건너뜀
-    if (existingNames.has(zipName)) {
+    if (existingNames.has(fileKey(zipName))) {
       skipped++;
       continue;
     }
@@ -361,7 +362,7 @@ async function syncBulletins() {
       },
     });
 
-    existingNames.add(zipName);
+    existingNames.add(fileKey(zipName));
     synced++;
 
     // 임시 파일 정리

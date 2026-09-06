@@ -8,6 +8,7 @@ import { join, basename } from 'path'
 import { execSync } from 'child_process'
 import os from 'os'
 import { nearestSunday, kstDateString } from './lib/service-date.mjs'
+import { fileKey } from './lib/filename.mjs'
 
 const prisma = new PrismaClient()
 
@@ -145,7 +146,7 @@ async function main() {
 
   // DB에 이미 있는 파일명 + createdAt (수정 감지용)
   const existing = await prisma.praiseConti.findMany({ select: { id: true, fileName: true, createdAt: true } })
-  const existingMap = new Map(existing.map((e) => [sanitizeFilename(e.fileName), e]))
+  const existingMap = new Map(existing.map((e) => [fileKey(sanitizeFilename(e.fileName)), e]))
 
   // .key 파일 목록
   let files
@@ -163,7 +164,7 @@ async function main() {
     const title = parseTitle(f)
     if (/^Presentation\s*\d*$/i.test(title)) return false
     const pdfName = sanitizeFilename(basename(f, '.key')) + '.pdf'
-    const record = existingMap.get(pdfName)
+    const record = existingMap.get(fileKey(pdfName))
     if (!record) return true  // DB에 없음 → 새 파일
     // DB에 있어도 .key 수정 시간이 더 최신이면 재동기화
     const mtime = statSync(join(KEYNOTE_DIR, f)).mtime
@@ -214,7 +215,7 @@ async function main() {
 
     const musicalKey = parseMusicalKey(file)
     const title = parseTitle(file)
-    const existing = existingMap.get(pdfName)
+    const existing = existingMap.get(fileKey(pdfName))
 
     if (existing) {
       // 수정된 파일 → 업데이트
