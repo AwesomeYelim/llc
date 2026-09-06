@@ -1,2 +1,22 @@
 #!/bin/sh
-~/.nvm/versions/node/v22.13.0/bin/node ~/.nvm/versions/node/v22.13.0/bin/npx tsc --noEmit
+# 타입 오류가 있는 상태로 push 되는 것을 막는다.
+#
+# node 절대경로를 박아두면 그 머신에서만 동작한다(맥 nvm 경로 등).
+# PATH 에 node 가 있으면 그대로 쓰고, 없으면 nvm 을 로드해서 찾는다.
+# (맥 GUI git 클라이언트처럼 로그인 셸을 거치지 않아 PATH 가 비는 환경 대비)
+if ! command -v node >/dev/null 2>&1; then
+  for nvm_sh in "$NVM_DIR/nvm.sh" "$HOME/.nvm/nvm.sh"; do
+    if [ -s "$nvm_sh" ]; then
+      # shellcheck disable=SC1090
+      . "$nvm_sh"
+      break
+    fi
+  done
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-push: node 를 찾을 수 없어 타입 검사를 건너뜁니다." >&2
+  exit 0
+fi
+
+npx tsc --noEmit
