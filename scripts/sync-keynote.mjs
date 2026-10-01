@@ -94,11 +94,6 @@ with timeout of 240 seconds
     try
       close every document saving no
     end try
-  end tell
-  tell application "System Events"
-    set visible of process "Keynote Creator Studio" to false
-  end tell
-  tell application "Keynote Creator Studio"
     set theDoc to open POSIX file ${JSON.stringify(workKeyPath)}
     delay 8
     try
@@ -108,9 +103,11 @@ with timeout of 240 seconds
       close every document saving no
     end try
   end tell
-  tell application "System Events"
-    set visible of process "Keynote Creator Studio" to false
-  end tell
+  try
+    tell application "System Events"
+      set visible of process "Keynote Creator Studio" to false
+    end tell
+  end try
 end timeout`
 
   const scriptFile = join(TEMP_DIR, `export_${Date.now()}.applescript`)
