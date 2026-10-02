@@ -40,6 +40,18 @@ function sanitizeFilename(name) {
   return name.replace(/:/g, '_')
 }
 
+// Keynote Creator Studio 앱 강제 종료
+function killKeynote() {
+  try {
+    execSync('osascript -e \'tell application "Keynote Creator Studio" to quit saving no\'', { timeout: 10000, stdio: 'ignore' })
+    execSync('sleep 2')
+  } catch {}
+  try {
+    execSync('pkill -f "Keynote Creator Studio"', { stdio: 'ignore' })
+    execSync('sleep 2')
+  } catch {}
+}
+
 // Keynote Creator Studio 앱 실행 보장
 function ensureKeynoteRunning() {
   try {
@@ -179,8 +191,17 @@ async function main() {
 
   console.log(`처리할 파일 ${newFiles.length}개 발견 (신규 또는 수정)\n`)
 
+  const RESTART_EVERY = 5 // N개 변환마다 앱 재시작 (타임아웃 방지)
   let added = 0
-  for (const file of newFiles) {
+  for (let i = 0; i < newFiles.length; i++) {
+    // 첫 파일은 ensureKeynoteRunning이 이미 실행했으므로 skip, 이후 N개마다 재시작
+    if (i > 0 && i % RESTART_EVERY === 0) {
+      console.log('  앱 재시작 중 (타임아웃 방지)...')
+      killKeynote()
+      ensureKeynoteRunning()
+    }
+
+    const file = newFiles[i]
     const pdfName = sanitizeFilename(basename(file, '.key')) + '.pdf'
     const keyPath = join(KEYNOTE_DIR, file)
     const pdfPath = join(TEMP_DIR, pdfName)
@@ -189,7 +210,7 @@ async function main() {
     // birthtime 을 그대로 넣으면 토요일 같은 평일 날짜가 그대로 노출된다.
     const serviceDate = nearestSunday(statSync(keyPath).birthtime)
 
-    console.log(`[${added + 1}/${newFiles.length}] ${file}`)
+    console.log(`[${i + 1}/${newFiles.length}] ${file}`)
     console.log(`  변환 중 (.key → PDF)...`)
 
     const ok = exportToPdf(keyPath, pdfPath)
