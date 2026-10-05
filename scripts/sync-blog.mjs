@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const BLOG_ID = 'hey0190';
 const RSS_URL = `https://rss.blog.naver.com/${BLOG_ID}`;
+const SITE_URL = process.env.SITE_URL || 'https://dongnam-llc.vercel.app';
+const CRON_SECRET = process.env.CRON_SECRET;
 
 function parseCDATA(text) {
   return text.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
@@ -145,6 +147,20 @@ async function main() {
 
   console.log(`\nDone! Synced: ${synced}, Skipped: ${skipped}`);
   await prisma.$disconnect();
+
+  // 새 글이 있으면 Vercel 캐시 갱신
+  if (synced > 0 && CRON_SECRET) {
+    try {
+      const r = await fetch(`${SITE_URL}/api/revalidate`, {
+        method: 'POST',
+        headers: { 'x-revalidate-secret': CRON_SECRET, 'content-type': 'application/json' },
+        body: JSON.stringify({ paths: ['/columns', '/sermons'] }),
+      });
+      console.log(`캐시 갱신: ${r.ok ? '완료' : '실패 ' + r.status}`);
+    } catch (e) {
+      console.error('캐시 갱신 실패:', e.message);
+    }
+  }
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
