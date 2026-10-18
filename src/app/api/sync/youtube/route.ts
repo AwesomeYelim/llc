@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notifyIndexNow } from "@/lib/indexnow"
@@ -91,6 +91,8 @@ async function syncYoutube() {
   if (newPaths.length > 0 || deleted > 0) {
     if (newPaths.length > 0) notifyIndexNow(newPaths)
     revalidatePath("/sermons")
+    revalidatePath("/")
+    revalidateTag("home")
   }
 
   return { success: true, synced, skipped, deleted, total: videos.length }
