@@ -270,26 +270,45 @@ async function syncBulletins() {
 
   if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR, { recursive: true });
 
-  const existingFiles = await prisma.bulletinFile.findMany({ select: { fileName: true } });
-  const existingNames = new Set(existingFiles.map(e => fileKey(e.fileName)));
+  // bulletinId, createdAt, fileUrl 포함해서 가져오기 (변경 감지용)
+  const existingFiles = await prisma.bulletinFile.findMany({
+    select: { id: true, fileName: true, fileUrl: true, bulletinId: true, bulletin: { select: { createdAt: true } } },
+  });
+  const existingMap = new Map(existingFiles.map(e => [fileKey(e.fileName), e]));
 
   const folders = readdirSync(BULLETIN_DIR).filter(f => {
     const full = join(BULLETIN_DIR, f);
     return statSync(full).isDirectory() && /^(sun_)?\d{6}_/.test(f);
   }).sort();
 
-  let synced = 0, skipped = 0;
+  let synced = 0, skipped = 0, updated = 0;
 
   for (const folder of folders) {
     const serviceDate = parseBulletinFolderDate(folder);
     if (!serviceDate) continue;
 
     const zipName = `${folder}.zip`;
+    const existingRec = existingMap.get(fileKey(zipName));
 
-    // 이미 올라간 폴더는 건너뜀
-    if (existingNames.has(fileKey(zipName))) {
-      skipped++;
-      continue;
+    // 이미 올라간 폴더: 폴더 내 파일 mtime으로 변경 감지
+    if (existingRec) {
+      const folderPath = join(BULLETIN_DIR, folder);
+      const pdfFiles = readdirSync(folderPath).filter(f => !f.startsWith('.') && /\.pdf$/i.test(f));
+      const newestMtime = pdfFiles.reduce((max, f) => {
+        const t = statSync(join(folderPath, f)).mtime;
+        return t > max ? t : max;
+      }, new Date(0));
+
+      if (newestMtime <= existingRec.bulletin.createdAt) {
+        skipped++;
+        continue;
+      }
+
+      // 변경됨 → 서버 파일 삭제 후 재업로드
+      console.log(`  ↻ ${folder}/ (수정됨)`);
+      deleteFromServer(`bulletins/${zipName}`);
+      await prisma.bulletinFile.delete({ where: { id: existingRec.id } });
+      await prisma.bulletin.delete({ where: { id: existingRec.bulletinId } });
     }
 
     const folderPath = join(BULLETIN_DIR, folder);
@@ -362,8 +381,11 @@ async function syncBulletins() {
       },
     });
 
-    existingNames.add(fileKey(zipName));
-    synced++;
+    if (existingRec) {
+      updated++;
+    } else {
+      synced++;
+    }
 
     // 임시 파일 정리
     try {
@@ -371,7 +393,8 @@ async function syncBulletins() {
     } catch {}
   }
 
-  return { synced, skipped };
+  if (updated > 0) console.log(`  (수정 업데이트: ${updated}개)`);
+  return { synced, skipped, updated };
 }
 
 // ──────────────────────────────────────────────
@@ -404,7 +427,8 @@ async function main() {
     const r = await syncBulletins();
     totalSynced += r.synced;
     totalSkipped += r.skipped;
-    console.log(`\n  주보: ${r.synced}개 업로드, ${r.skipped}개 건너뜀`);
+    const updatedStr = r.updated ? `, ${r.updated}개 수정` : '';
+    console.log(`\n  주보: ${r.synced}개 업로드, ${r.skipped}개 건너뜀${updatedStr}`);
   }
 
   console.log(`\n=== 완료: ${totalSynced}개 업로드, ${totalSkipped}개 건너뜀 ===`);
