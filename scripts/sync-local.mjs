@@ -270,9 +270,9 @@ async function syncBulletins() {
 
   if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR, { recursive: true });
 
-  // bulletinId, createdAt, fileUrl 포함해서 가져오기 (변경 감지용)
+  // sourceSize 포함해서 가져오기 (파일 크기 기반 변경 감지용)
   const existingFiles = await prisma.bulletinFile.findMany({
-    select: { id: true, fileName: true, fileUrl: true, bulletinId: true, bulletin: { select: { createdAt: true } } },
+    select: { id: true, fileName: true, fileUrl: true, bulletinId: true, sourceSize: true },
   });
   const existingMap = new Map(existingFiles.map(e => [fileKey(e.fileName), e]));
 
@@ -290,31 +290,28 @@ async function syncBulletins() {
     const zipName = `${folder}.zip`;
     const existingRec = existingMap.get(fileKey(zipName));
 
-    // 이미 올라간 폴더: 폴더 내 파일 mtime으로 변경 감지
-    if (existingRec) {
-      const folderPath = join(BULLETIN_DIR, folder);
-      const pdfFiles = readdirSync(folderPath).filter(f => !f.startsWith('.') && /\.pdf$/i.test(f));
-      const newestMtime = pdfFiles.reduce((max, f) => {
-        const t = statSync(join(folderPath, f)).mtime;
-        return t > max ? t : max;
-      }, new Date(0));
+    const folderPath = join(BULLETIN_DIR, folder);
+    const pdfFilesInFolder = readdirSync(folderPath).filter(f => !f.startsWith('.') && /\.pdf$/i.test(f));
+    const currentSourceSize = pdfFilesInFolder.reduce((sum, f) => sum + statSync(join(folderPath, f)).size, 0);
 
-      if (newestMtime <= existingRec.bulletin.createdAt) {
+    // 이미 올라간 폴더: PDF 총 크기로 변경 감지
+    if (existingRec) {
+      const storedSourceSize = existingRec.sourceSize !== null ? Number(existingRec.sourceSize) : null;
+
+      // sourceSize가 없는 기존 레코드는 크기 모르니 첫 번 기록만 함 (skip)
+      if (storedSourceSize === null || currentSourceSize === storedSourceSize) {
         skipped++;
         continue;
       }
 
-      // 변경됨 → 서버 파일 삭제 후 재업로드
-      console.log(`  ↻ ${folder}/ (수정됨)`);
+      // 크기 다름 → 변경됨 → 서버 파일 삭제 후 재업로드
+      console.log(`  ↻ ${folder}/ (크기 변경: ${storedSourceSize} → ${currentSourceSize})`);
       deleteFromServer(`bulletins/${zipName}`);
       await prisma.bulletinFile.delete({ where: { id: existingRec.id } });
       await prisma.bulletin.delete({ where: { id: existingRec.bulletinId } });
     }
 
-    const folderPath = join(BULLETIN_DIR, folder);
-    const files = readdirSync(folderPath).filter(f =>
-      !f.startsWith('.') && /\.pdf$/i.test(f)
-    );
+    const files = pdfFilesInFolder;
 
     if (files.length === 0) continue;
 
@@ -366,7 +363,7 @@ async function syncBulletins() {
     const fileUrl = uploadToServer(zipPath, `bulletins/${zipName}`);
 
     // DB 생성: 하나의 Bulletin + 하나의 BulletinFile (ZIP)
-    const bulletin = await prisma.bulletin.create({
+    await prisma.bulletin.create({
       data: {
         title,
         serviceDate,
@@ -376,6 +373,7 @@ async function syncBulletins() {
             fileName: zipName,
             fileUrl,
             fileSize: zipSize,
+            sourceSize: currentSourceSize,
           },
         },
       },

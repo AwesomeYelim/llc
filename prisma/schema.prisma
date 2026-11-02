@@ -120,6 +120,7 @@ model BulletinFile {
   fileName      String
   fileUrl       String
   fileSize      Int
+  sourceSize    BigInt?
   downloadCount Int      @default(0)
   bulletinId    Int
   bulletin      Bulletin @relation(fields: [bulletinId], references: [id], onDelete: Cascade)
