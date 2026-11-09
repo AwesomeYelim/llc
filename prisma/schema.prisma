@@ -16,6 +16,7 @@ datasource db {
 
 enum ServiceType {
   SUNDAY_MAIN
+  SUNDAY_AFTERNOON
   SUNDAY_SCHOOL
   WEDNESDAY
   FRIDAY

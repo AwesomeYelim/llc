@@ -65,6 +65,7 @@ export function formatFileSize(bytes: number): string {
 export function serviceTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     SUNDAY_MAIN: "주일예배",
+    SUNDAY_AFTERNOON: "오후찬양예배",
     SUNDAY_SCHOOL: "주일학교",
     WEDNESDAY: "수요예배",
     FRIDAY: "금요예배",

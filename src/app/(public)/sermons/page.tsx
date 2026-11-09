@@ -70,7 +70,7 @@ export default async function SermonsPage({
           >
             전체
           </Link>
-          {["SUNDAY_MAIN", "WEDNESDAY", "FRIDAY", "SPECIAL"].map((type) => (
+          {["SUNDAY_MAIN", "SUNDAY_AFTERNOON", "WEDNESDAY", "FRIDAY", "SPECIAL"].map((type) => (
             <Link
               key={type}
               href={`/sermons?serviceType=${type}`}
