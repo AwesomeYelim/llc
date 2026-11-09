@@ -46,8 +46,12 @@ async function syncYoutube() {
   for (const video of videos) {
     const title = video.title.trim()
 
-    // 쇼츠는 자동 동기화 제외
-    if (title.toLowerCase().includes("#shorts") || title.includes("쇼츠")) {
+    // 쇼츠·클립 제외 (제목에 목사 이름 포함된 클립 or 쇼츠 태그)
+    if (
+      title.toLowerCase().includes("#shorts") ||
+      title.includes("쇼츠") ||
+      title.includes("· 홍은익 목사")
+    ) {
       skipped++
       continue
     }
@@ -62,7 +66,12 @@ async function syncYoutube() {
     }
 
     const scriptureMatch = title.match(/([가-힣]+\s*\d+[:\s]*\d+[-~]?\d*)/)
-    const serviceType = title.includes("오후찬양예배") ? "SUNDAY_AFTERNOON" : "SUNDAY_MAIN"
+    const isAfternoon =
+      title.includes("오후찬양예배") ||
+      title.includes("오후 예배") ||
+      title.includes("오후예배") ||
+      title.includes("주일 찬양 예배")
+    const serviceType = isAfternoon ? "SUNDAY_AFTERNOON" : "SUNDAY_MAIN"
 
     const sermon = await prisma.sermon.create({
       data: {
