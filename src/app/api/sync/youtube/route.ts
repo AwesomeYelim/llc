@@ -44,13 +44,10 @@ async function syncYoutube() {
   const newPaths: string[] = []
 
   for (const video of videos) {
-    // 오후찬양예배·쇼츠는 별도 관리 → 자동 동기화 제외
     const title = video.title.trim()
-    if (
-      title.includes("오후찬양예배") ||
-      title.toLowerCase().includes("#shorts") ||
-      title.includes("쇼츠")
-    ) {
+
+    // 쇼츠는 자동 동기화 제외
+    if (title.toLowerCase().includes("#shorts") || title.includes("쇼츠")) {
       skipped++
       continue
     }
@@ -64,14 +61,15 @@ async function syncYoutube() {
       continue
     }
 
-    const scriptureMatch = video.title.match(/([가-힣]+\s*\d+[:\s]*\d+[-~]?\d*)/)
+    const scriptureMatch = title.match(/([가-힣]+\s*\d+[:\s]*\d+[-~]?\d*)/)
+    const serviceType = title.includes("오후찬양예배") ? "SUNDAY_AFTERNOON" : "SUNDAY_MAIN"
 
     const sermon = await prisma.sermon.create({
       data: {
-        title: video.title.trim(),
+        title,
         scripture: scriptureMatch?.[1] ?? "",
         sermonDate: new Date(video.published),
-        serviceType: "SUNDAY_MAIN",
+        serviceType,
         youtubeUrl: `https://www.youtube.com/watch?v=${video.videoId}`,
         youtubeId: video.videoId,
       },
