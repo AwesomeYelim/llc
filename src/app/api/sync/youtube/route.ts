@@ -13,6 +13,19 @@ interface VideoEntry {
   published: string
 }
 
+async function getVideoDurationSeconds(videoId: string): Promise<number> {
+  try {
+    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: { "Accept-Language": "ko-KR" },
+    })
+    const html = await res.text()
+    const m = html.match(/"lengthSeconds":"(\d+)"/)
+    return m ? parseInt(m[1]) : 0
+  } catch {
+    return 0
+  }
+}
+
 function parseXML(xml: string): VideoEntry[] {
   const entries: VideoEntry[] = []
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g
@@ -46,16 +59,6 @@ async function syncYoutube() {
   for (const video of videos) {
     const title = video.title.trim()
 
-    // 쇼츠·클립 제외 (제목에 목사 이름 포함된 클립 or 쇼츠 태그)
-    if (
-      title.toLowerCase().includes("#shorts") ||
-      title.includes("쇼츠") ||
-      title.includes("· 홍은익 목사")
-    ) {
-      skipped++
-      continue
-    }
-
     const existing = await prisma.sermon.findFirst({
       where: { youtubeId: video.videoId },
     })
@@ -65,12 +68,19 @@ async function syncYoutube() {
       continue
     }
 
+    // 라이브 예배만 동기화 — 20분 미만 클립·쇼츠 제외
+    const duration = await getVideoDurationSeconds(video.videoId)
+    if (duration < 1200) {
+      skipped++
+      continue
+    }
+
     const scriptureMatch = title.match(/([가-힣]+\s*\d+[:\s]*\d+[-~]?\d*)/)
     const isAfternoon =
       title.includes("오후찬양예배") ||
       title.includes("오후 예배") ||
       title.includes("오후예배") ||
-      title.includes("주일 찬양 예배")
+      title.includes("찬양 예배")
     const serviceType = isAfternoon ? "SUNDAY_AFTERNOON" : "SUNDAY_MAIN"
 
     const sermon = await prisma.sermon.create({
