@@ -13,19 +13,6 @@ interface VideoEntry {
   published: string
 }
 
-async function getVideoDurationSeconds(videoId: string): Promise<number> {
-  try {
-    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-      headers: { "Accept-Language": "ko-KR" },
-    })
-    const html = await res.text()
-    const m = html.match(/"lengthSeconds":"(\d+)"/)
-    return m ? parseInt(m[1]) : 0
-  } catch {
-    return 0
-  }
-}
-
 function parseXML(xml: string): VideoEntry[] {
   const entries: VideoEntry[] = []
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g
@@ -68,9 +55,15 @@ async function syncYoutube() {
       continue
     }
 
-    // 라이브 예배만 동기화 — 20분 미만 클립·쇼츠 제외
-    const duration = await getVideoDurationSeconds(video.videoId)
-    if (duration < 1200) {
+    // 편집본·클립 제외: " | " 구분자는 편집 업로드 형식에만 쓰임
+    // 쇼츠 제외: #Shorts / #쇼츠 태그 확인
+    // 라이브 예배 필수: "예배" 또는 "찬양" 포함 여부로 판단
+    const isEditedRepost = title.includes(" | ")
+    const isShort =
+      title.toLowerCase().includes("#shorts") || title.includes("#쇼츠")
+    const isServiceVideo = title.includes("예배") || title.includes("찬양예배")
+
+    if (isEditedRepost || isShort || !isServiceVideo) {
       skipped++
       continue
     }
