@@ -55,15 +55,13 @@ async function syncYoutube() {
       continue
     }
 
-    // 편집본·클립 제외: " | " 구분자는 편집 업로드 형식에만 쓰임
-    // 쇼츠 제외: #Shorts / #쇼츠 태그 확인
-    // 라이브 예배 필수: "예배" 또는 "찬양" 포함 여부로 판단
+    // 라이브 예배만: 제목이 반드시 "N월"로 시작해야 함
+    // "주님 날 위해 / 오후 찬양 예배" 같은 찬양 모음은 제외
+    // 편집본·클립(" | " 포함)도 제외
+    const startsWithDate = /^\d+월/.test(title)
     const isEditedRepost = title.includes(" | ")
-    const isShort =
-      title.toLowerCase().includes("#shorts") || title.includes("#쇼츠")
-    const isServiceVideo = title.includes("예배") || title.includes("찬양예배")
 
-    if (isEditedRepost || isShort || !isServiceVideo) {
+    if (!startsWithDate || isEditedRepost) {
       skipped++
       continue
     }
