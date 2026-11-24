@@ -101,25 +101,47 @@ function exportToPdf(keyPath, pdfPath) {
   }
 
   const script = `
-with timeout of 240 seconds
-  tell application "Keynote Creator Studio"
-    try
-      close every document saving no
-    end try
-    set theDoc to open POSIX file ${JSON.stringify(workKeyPath)}
-    delay 8
-    try
-      export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
-    end try
-    try
-      close every document saving no
-    end try
-  end tell
+-- 1) 기존 문서 닫기
+tell application "Keynote Creator Studio"
   try
-    tell application "System Events"
-      set visible of process "Keynote Creator Studio" to false
-    end tell
+    with timeout of 10 seconds
+      close every document saving no
+    end timeout
   end try
+end tell
+
+-- 2) 응답 대기 없이 파일 열기 (open 명령이 응답을 기다리면 -1712 타임아웃 발생)
+ignoring application responses
+  tell application "Keynote Creator Studio"
+    open POSIX file ${JSON.stringify(workKeyPath)}
+  end tell
+end ignoring
+
+-- 3) 문서가 열릴 때까지 최대 60초 대기
+set docReady to false
+repeat 30 times
+  delay 2
+  try
+    with timeout of 3 seconds
+      tell application "Keynote Creator Studio"
+        if (count of documents) > 0 then
+          set docReady to true
+          exit repeat
+        end if
+      end tell
+    end timeout
+  end try
+end repeat
+
+if not docReady then error "문서가 60초 내에 열리지 않았습니다"
+
+-- 4) PDF 내보내기
+with timeout of 180 seconds
+  tell application "Keynote Creator Studio"
+    set theDoc to document 1
+    export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
+    close every document saving no
+  end tell
 end timeout`
 
   const scriptFile = join(TEMP_DIR, `export_${Date.now()}.applescript`)
@@ -186,7 +208,8 @@ async function main() {
     return
   }
 
-  // 새 파일이 있을 때만 Keynote 실행
+  // 새 파일이 있을 때만 Keynote 실행 — 이전 실행의 잔여 문서 상태를 없애기 위해 항상 재시작
+  killKeynote()
   ensureKeynoteRunning()
 
   console.log(`처리할 파일 ${newFiles.length}개 발견 (신규 또는 수정)\n`)
