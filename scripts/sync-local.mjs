@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import { readdirSync, statSync, existsSync, mkdirSync, unlinkSync, writeFileSync, readFileSync } from 'fs';
 import { join, extname, basename } from 'path';
 import { execSync } from 'child_process';
 import { nearestSunday, parseBulletinFolderDate, kstDateString } from './lib/service-date.mjs';
@@ -16,9 +16,12 @@ const FILE_SERVER_BASE_URL = process.env.FILE_SERVER_BASE_URL || `http://${FILE_
 
 function uploadToServer(localPath, remoteSubpath) {
   const remotePath = `${FILE_SERVER_ASSETS_DIR}/${remoteSubpath}`;
+  // scp는 URL-인코딩된 긴 한국어 파일명에서 SFTP "Bad message" 오류 발생.
+  // stdin 파이프 방식으로 우회한다.
+  const fileContent = readFileSync(localPath);
   execSync(
-    `scp -o StrictHostKeyChecking=no "${localPath}" ${FILE_SERVER_USER}@${FILE_SERVER_HOST}:"${remotePath}"`,
-    { timeout: 120000 }
+    `ssh -o StrictHostKeyChecking=no ${FILE_SERVER_USER}@${FILE_SERVER_HOST} "cat > '${remotePath}'"`,
+    { input: fileContent, timeout: 120000 }
   );
   return `${FILE_SERVER_BASE_URL}/${remoteSubpath}`;
 }
@@ -133,15 +136,39 @@ function exportKeynoteToPdf(keyPath, pdfPath) {
   const script = `tell application "Keynote Creator Studio"
   activate
   open POSIX file ${JSON.stringify(keyPath)}
-  delay 4
-  set theDoc to front document
-  export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
-  close theDoc saving no
+  delay 8
+end tell
+
+-- 열기 후 나타나는 업데이트·저장 다이얼로그 닫기
+tell application "System Events"
+  tell process "Keynote Creator Studio"
+    repeat 5 times
+      set btnLabels to {"OK", "Update", "Don't Save", "계속", "확인", "업데이트"}
+      set dismissed to false
+      repeat with lbl in btnLabels
+        if exists (button lbl of window 1) then
+          click (button lbl of window 1)
+          set dismissed to true
+          delay 1
+          exit repeat
+        end if
+      end repeat
+      if not dismissed then exit repeat
+    end repeat
+  end tell
+end tell
+
+tell application "Keynote Creator Studio"
+  with timeout of 600 seconds
+    set theDoc to front document
+    export theDoc to POSIX file ${JSON.stringify(pdfPath)} as PDF with properties {PDF image quality:Best}
+    close theDoc saving no
+  end timeout
 end tell`;
   const scriptFile = `/tmp/_keynote_export_${Date.now()}.applescript`;
   writeFileSync(scriptFile, script);
   try {
-    execSync(`osascript ${JSON.stringify(scriptFile)}`, { timeout: 120000 });
+    execSync(`osascript ${JSON.stringify(scriptFile)}`, { timeout: 660000 });
     return existsSync(pdfPath);
   } catch (e) {
     console.log(`    ⚠ PDF 변환 실패: ${e.message}`);
