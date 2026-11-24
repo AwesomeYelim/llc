@@ -3,9 +3,8 @@
 import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
-  // 교회명으로 검색하면 네이버 지도에서 정확한 위치 핀이 찍힘
-  // 네이버 지도에 등록된 정식 명칭으로 검색해야 교회 핀이 정확히 표시됨
-  const naverMapUrl = `https://map.naver.com/p/search/${encodeURIComponent("동남 생명의빛교회")}?c=17.00,0,0,0,dh`
+  // 네이버 지도는 iframe 임베드를 차단(X-Frame-Options)하므로 Google Maps embed 사용
+  const googleMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent("동남 생명의빛교회 청주")}&output=embed&hl=ko`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
@@ -86,11 +85,12 @@ export function KakaoMap({ address }: { address: string }) {
             className="lg:col-span-3 relative h-[350px] lg:h-auto lg:min-h-[400px] rounded-2xl overflow-hidden shadow-lg"
           >
             <iframe
-              src={naverMapUrl}
-              style={{ border: 0, position: "absolute", top: 0, left: "-500px", width: "calc(100% + 500px)", height: "100%" }}
-              sandbox="allow-scripts allow-same-origin"
+              src={googleMapUrl}
+              style={{ border: 0, position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+              allowFullScreen
               loading="lazy"
-              title="교회 위치 - 네이버 지도"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="교회 위치"
             />
           </motion.div>
         </div>
