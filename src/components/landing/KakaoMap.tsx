@@ -3,8 +3,8 @@
 import { motion } from "framer-motion"
 
 export function KakaoMap({ address }: { address: string }) {
-  // 네이버 지도는 iframe 임베드를 차단(X-Frame-Options)하므로 Google Maps embed 사용
-  const googleMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent("충북 청주시 상당구 충고개로125번길 29")}&output=embed&hl=ko`
+  // 좌표 기반 Google Maps embed (Naver Place에서 확인한 정확한 좌표)
+  const googleMapUrl = `https://maps.google.com/maps?q=36.6144323,127.5169728&z=17&output=embed&hl=ko`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
