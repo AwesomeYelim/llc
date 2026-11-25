@@ -42,7 +42,7 @@ export function ChurchMap() {
 
       L.marker([LAT, LNG])
         .addTo(map)
-        .bindPopup("<b>동남 생명의빛교회</b><br>충고개로125번길 29")
+        .bindPopup("<b>동남 생명의빛교회</b><br>중고개로125번길 29")
         .openPopup()
     }
 
