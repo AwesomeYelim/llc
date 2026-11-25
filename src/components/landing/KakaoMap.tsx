@@ -1,10 +1,14 @@
 "use client"
 
 import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
+
+const ChurchMap = dynamic(
+  () => import("./NaverMap").then((m) => m.ChurchMap),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gray-100 animate-pulse rounded-2xl" /> }
+)
 
 export function KakaoMap({ address }: { address: string }) {
-  // 좌표 기반 Google Maps embed (Naver Place에서 확인한 정확한 좌표)
-  const googleMapUrl = `https://maps.google.com/maps?q=36.6144323,127.5169728&z=17&output=embed&hl=ko`
 
   return (
     <section className="bg-[#f5f3f0] py-24 lg:py-32 px-6 lg:px-12">
@@ -84,14 +88,7 @@ export function KakaoMap({ address }: { address: string }) {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-3 relative h-[350px] lg:h-auto lg:min-h-[400px] rounded-2xl overflow-hidden shadow-lg"
           >
-            <iframe
-              src={googleMapUrl}
-              style={{ border: 0, position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="교회 위치"
-            />
+            <ChurchMap />
           </motion.div>
         </div>
       </div>
